@@ -28,7 +28,7 @@ export class MCQService {
 
   private getApiUrl(): string {
     // Use environment variable for deployed version, fallback to Render backend if not set
-    const baseUrl = (window as any).__API_URL__ || 'https://mcq-exam-backend-new.onrender.com';
+    const baseUrl = (window as any).__API_URL__ || 'https://mcq-exam-backend-new-v1.onrender.com';
     return `${baseUrl}/api/mcq/generate`;
   }
 
