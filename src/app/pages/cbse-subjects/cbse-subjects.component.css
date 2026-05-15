@@ -1,0 +1,146 @@
+.cbse-subjects-container {
+  width:min(100%,1200px);
+  margin:0 auto;
+  padding:24px 16px 60px;
+}
+
+.header-section {
+  margin-bottom: 32px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.back-button {
+  margin-right: 8px;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.subtitle {
+  margin: 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.subjects-section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.loading-spinner,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #4b5563;
+}
+
+.loading-spinner p,
+.empty-state p {
+  margin-top: 16px;
+  font-size: 1rem;
+}
+
+.subject-card {
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: 2px solid #e5e7eb;
+}
+
+.subject-card:not(.unavailable):hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+.subject-card.unavailable {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.subject-content {
+  text-align: center;
+  padding: 24px;
+  position: relative;
+}
+
+.subject-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.subject-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.subject-content p {
+  margin: 0 0 16px 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.coming-soon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #f59e0b;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .cbse-subjects-container {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .subjects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .subject-content {
+    padding: 20px;
+  }
+
+  .subject-icon {
+    font-size: 2.5rem;
+  }
+}

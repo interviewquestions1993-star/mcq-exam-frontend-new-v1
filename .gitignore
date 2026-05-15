@@ -1,0 +1,33 @@
+# Angular
+/dist/
+/node_modules/
+.angular/
+npm-debug.log
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Testing
+karma.conf.js
+/coverage/
+
+# Build output
+/dist/

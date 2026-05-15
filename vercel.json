@@ -1,0 +1,7 @@
+{
+  "buildCommand": "ng build --configuration production",
+  "outputDirectory": "dist/mcq-exam-preparer",
+  "env": {
+    "VITE_API_URL": "@vite_api_url"
+  }
+}

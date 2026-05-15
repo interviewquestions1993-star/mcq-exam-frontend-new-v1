@@ -1,0 +1,92 @@
+.about-container {
+  width: min(100%, 800px);
+  margin: 20px auto;
+  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.about-card {
+  padding: 20px;
+}
+
+.about-card mat-card-title {
+  font-size: 2em;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.about-card h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.about-card h3::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.about-card h3:nth-of-type(1)::before { /* Our Mission */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>');
+}
+
+.about-card h3:nth-of-type(2)::before { /* What We Offer */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>');
+}
+
+.about-card h3:nth-of-type(3)::before { /* Technology Stack */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
+}
+
+.about-card h3:nth-of-type(4)::before { /* Contact Us */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231976d2"><path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
+}
+
+.about-card ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.about-card li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.about-card a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.about-card a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .about-container {
+    padding: 16px;
+  }
+
+  .about-card {
+    padding: 16px;
+  }
+
+  .about-card h3 {
+    font-size: 1.15rem;
+  }
+}
