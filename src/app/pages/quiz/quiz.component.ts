@@ -37,13 +37,9 @@ interface QuizQuestion extends MCQQuestion {
           <p class="loader-heading">Preparing your quiz...</p>
           <div class="loading-bar-wrapper">
             <mat-progress-bar mode="determinate" [value]="loadProgress" color="primary" class="stylish-progress"></mat-progress-bar>
-            <div class="loading-progress-text">{{ loadProgress }}% complete</div>
           </div>
           <div *ngIf="busyMessage" class="loading-hold-message">
             {{ busyMessage }}
-          </div>
-          <div class="loading-steps">
-            <span *ngFor="let step of loadingSteps" [class.active]="loadProgress >= step.value">{{ step.label }}</span>
           </div>
         </div>
       </div>
@@ -163,18 +159,6 @@ export class QuizComponent implements OnInit {
   targetQuestionCount = 5;
   loadProgress = 0;
   busyMessage = '';
-  loadingSteps = [
-    { value: 10, label: '10% complete' },
-    { value: 20, label: '20% complete' },
-    { value: 30, label: '30% complete' },
-    { value: 40, label: '40% complete' },
-    { value: 50, label: '50% complete' },
-    { value: 60, label: '60% complete' },
-    { value: 70, label: '70% complete' },
-    { value: 80, label: '80% complete' },
-    { value: 90, label: '90% complete' },
-    { value: 100, label: '100% complete' }
-  ];
   private loadingInterval: any;
   error: string = '';
   selectedAnswers: { [key: string]: string } = {};

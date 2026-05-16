@@ -91,12 +91,14 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
       <div class="search-hint-card">
         <p class="hint-title">Try these search terms</p>
         <div class="hint-chip-row">
+          <span class="hint-chip">🔎 NEET Reexam Biology & Physics Questions</span>
           <span class="hint-chip">🔎 React Advanced Interview Questions</span>
           <span class="hint-chip">🔎 Angular Architect Interview Questions</span>
           <span class="hint-chip">🔎 Azure Interview Questions</span>
           <span class="hint-chip">🔎 CBSE Class 10 Science Questions</span>
         </div>
         <p class="hint-note">...and many more topics are supported.</p>
+        <p class="hint-note">If you're preparing for next month's NEET reexam, try topic queries like "NEET Biology", "NEET Chemistry", or "NEET Physics" for targeted practice and high-yield review.</p>
         <p class="hint-note">If questions seem repetitive, try typing different search words or topics to generate a new set of questions.</p>
         <p class="hint-help"><mat-icon class="hint-mail-icon">email</mat-icon><a class="hint-mail-link" href="mailto:interviewquestions1993@gmail.com">Send us a mail if you want any new topics added.</a></p>
       </div>
@@ -186,6 +188,7 @@ export class HomeComponent implements OnInit {
 
   popularTopics = [
     { name: 'CBSE', icon: '📚', difficulty: 'Classes 1-12' },
+    { name: 'NEET', icon: '🧪', difficulty: 'Reexam Prep: Biology, Chemistry, Physics' },
     { name: 'Angular', icon: '⚡', difficulty: 'All Levels' },
     { name: 'React', icon: '⚛️', difficulty: 'All Levels' },
     { name: 'Python', icon: '🐍', difficulty: 'All Levels' },
