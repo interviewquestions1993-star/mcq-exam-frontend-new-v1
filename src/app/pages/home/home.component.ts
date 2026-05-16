@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -118,20 +118,39 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
       </div>
 
       <!-- Popular Topics -->
-      <div class="popular-section">
-        <h2>Popular Topics</h2>
-        <div class="topics-grid">
-          <div
-            *ngFor="let t of popularTopics"
-            class="topic-card"
-            (click)="startQuizWithTopic(t.name)"
-          >
-            <div class="topic-icon">{{ t.icon }}</div>
-            <h3>{{ t.name }}</h3>
-            <p class="difficulty">{{ t.difficulty }}</p>
+      <ng-template #popularTopicsDeferred @defer>
+        <div class="popular-section">
+          <h2>Popular Topics</h2>
+          <div class="topics-grid">
+            <div
+              *ngFor="let t of popularTopics"
+              class="topic-card"
+              (click)="startQuizWithTopic(t.name)"
+            >
+              <div class="topic-icon">{{ t.icon }}</div>
+              <h3>{{ t.name }}</h3>
+              <p class="difficulty">{{ t.difficulty }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </ng-template>
+
+      <ng-container *ngIf="showTopics; else popularTopicsPlaceholder">
+        <ng-container *ngTemplateOutlet="popularTopicsDeferred"></ng-container>
+      </ng-container>
+
+      <ng-template #popularTopicsPlaceholder>
+        <div class="popular-section popular-placeholder">
+          <h2>Popular Topics</h2>
+          <div class="topics-grid">
+            <div class="topic-card placeholder" *ngFor="let _ of placeholderTopics">
+              <div class="topic-icon"></div>
+              <h3></h3>
+              <p class="difficulty"></p>
+            </div>
+          </div>
+        </div>
+      </ng-template>
 
       <!-- Features Section -->
       <div class="features-section">
@@ -158,10 +177,12 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
   `,
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   topic = '';
   questionCount = 5;
   isLoading = false;
+  showTopics = false;
+  placeholderTopics = Array(8);
 
   popularTopics = [
     { name: 'CBSE', icon: '📚', difficulty: 'Classes 1-12' },
@@ -181,7 +202,7 @@ export class HomeComponent {
     'fuck', 'shit', 'damn', 'bitch', 'asshole', 'cunt', 'dick', 'pussy',
     'rape', 'murder', 'kill', 'death', 'suicide', 'drugs', 'cocaine', 'heroin',
     'terrorism', 'bomb', 'explosive', 'hack', 'crack', 'virus', 'malware',
-    'injection', 'sql', 'script', 'javascript', 'alert', 'eval', 'document.cookie'
+    'injection', 'script', 'alert', 'eval', 'document.cookie'
   ];
 
   constructor(private router: Router, private snackBar: MatSnackBar) {}
@@ -222,6 +243,22 @@ export class HomeComponent {
       });
       this.isLoading = false;
     }, 500);
+  }
+
+  ngOnInit() {
+    if (typeof window !== 'undefined') {
+      const show = () => {
+        this.showTopics = true;
+      };
+
+      if (document.readyState === 'complete') {
+        show();
+      } else {
+        window.addEventListener('load', show, { once: true });
+      }
+    } else {
+      this.showTopics = true;
+    }
   }
 
   startQuizWithTopic(topicName: string) {

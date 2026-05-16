@@ -28,6 +28,11 @@
 .topics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
 .topic-card{background:#fff;border-radius:24px;padding:24px;text-align:center;cursor:pointer;box-shadow:0 18px 45px rgba(15,23,42,.06);border:1px solid rgba(226,232,240,.95);}
 .topic-card:hover{transform:translateY(-4px);box-shadow:0 24px 55px rgba(15,23,42,.12);}
+.topic-card.placeholder{background:linear-gradient(90deg, #eef2ff 0%, #f8fafc 100%);cursor:default;pointer-events:none;}
+.topic-card.placeholder:hover{transform:none;box-shadow:0 18px 45px rgba(15,23,42,.06);}
+.topic-card.placeholder .topic-icon{background:rgba(99,102,241,.12);color:transparent;}
+.topic-card.placeholder h3,.topic-card.placeholder .difficulty{background:rgba(226,232,240,.8);color:transparent;border-radius:8px;margin:8px auto 0;width:70%;height:18px;}
+.topic-card.placeholder .difficulty{width:50%;height:14px;margin-top:12px;}
 .topic-icon{width:64px;height:64px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;border-radius:20px;background:rgba(99,102,241,.12);color:#4338ca;}
 .topic-card h3{font-size:1.1rem;font-weight:700;margin:0 0 8px;color:#111827;}
 .difficulty{color:#6b7280;font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;margin:0;}
