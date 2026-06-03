@@ -3,14 +3,18 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { ThemeService } from './services/theme.service';
+import { CommonModule } from '@angular/common';
 import { SeoService } from './services/seo.service';
+import { AuthService, AuthUser } from './services/auth.service';
+import { Observable } from 'rxjs';
 
 declare let gtag: Function;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, MatIconModule],
+  imports: [RouterOutlet, RouterLink, MatIconModule, CommonModule],
   template: `
     <header class="app-header">
       <div class="toolbar-container">
@@ -24,6 +28,27 @@ declare let gtag: Function;
             <mat-icon>contact_mail</mat-icon>
             Contact
           </a>
+          <div *ngIf="(isAuthenticated$ | async) as isAuth" class="auth-section" [class.authenticated]="isAuth">
+            <div class="user-profile" *ngIf="currentUser$ | async as user">
+              <img [src]="user.picture" [alt]="user.name" class="user-avatar" [title]="user.name">
+              <span class="user-name">{{ user.name }}</span>
+              <button (click)="logout()" class="logout-btn" title="Logout">
+                <mat-icon>logout</mat-icon>
+              </button>
+            </div>
+            <a *ngIf="!isAuth" routerLink="/login" class="login-btn">
+              <mat-icon>login</mat-icon>
+              Login
+            </a>
+          </div>
+          <a *ngIf="!(isAuthenticated$ | async)" routerLink="/login" class="login-link">
+            <mat-icon>login</mat-icon>
+            Login
+          </a>
+          <button class="theme-toggle" (click)="toggleTheme()" [title]="(theme === 'dark' ? 'Switch to light' : 'Switch to dark')">
+            <mat-icon *ngIf="theme === 'dark'">dark_mode</mat-icon>
+            <mat-icon *ngIf="theme !== 'dark'">light_mode</mat-icon>
+          </button>
         </nav>
       </div>
     </header>
@@ -59,11 +84,21 @@ declare let gtag: Function;
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  currentUser$: Observable<AuthUser | null>;
+  isAuthenticated$: Observable<boolean>;
+  theme: string = 'light';
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private seoService: SeoService
-  ) {}
+    private seoService: SeoService,
+    private authService: AuthService
+    , private themeService: ThemeService
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.themeService.theme$.subscribe(t => this.theme = t);
+  }
 
   ngOnInit() {
     // Handle route changes for analytics and SEO
@@ -91,6 +126,15 @@ export class AppComponent implements OnInit {
           page_path: event.urlAfterRedirects
         });
       });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
+
+  toggleTheme() {
+    this.themeService.toggle();
   }
 
   private updateSeoForRoute(url: string, routeData: any) {

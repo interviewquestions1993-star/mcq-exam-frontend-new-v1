@@ -11,9 +11,84 @@
 html, body {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  color: #222a42;
-  background-color: #f5f7fa;
+  color: var(--text-color, #222a42);
+  background-color: var(--page-bg, #f5f7fa);
 }
+
+/* CSS variables for theming */
+:root {
+  --page-bg: #f5f7fa;
+  --text-color: #222a42;
+  --muted: #6b7280;
+  --header-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --accent-bg: rgba(255, 202, 71, 0.12);
+  --accent-border: rgba(255, 202, 71, 0.28);
+}
+
+/* Dark theme overrides */
+.dark-theme {
+  --page-bg: #0b1020;
+  --text-color: #e6eef8;
+  --muted: #9aa7bf;
+  --header-gradient: linear-gradient(135deg, #0f1724 0%, #0b1220 100%);
+  --accent-bg: rgba(79, 140, 255, 0.06);
+  --accent-border: rgba(79, 140, 255, 0.18);
+}
+
+/* Dark mode: convert common white surfaces to dark surfaces and force text to light */
+.dark-theme {
+  --card-bg: #0f1724;
+  --surface: #0b1220;
+  --muted-border: rgba(255,255,255,0.06);
+}
+
+/* Apply the dark surface to common white elements */
+.dark-theme .mat-mdc-card,
+.dark-theme .mat-mdc-form-field .mat-mdc-form-field-wrapper,
+.dark-theme .quiz-container .progress-header,
+.dark-theme .quiz-container .question-container,
+.dark-theme .quiz-container .navigation-buttons,
+.dark-theme .quiz-container .no-results-card,
+.dark-theme .results-container .stat-card,
+.dark-theme .results-container .review-card,
+.dark-theme .results-container .no-results-card,
+.dark-theme .persisted-container .mcq-card,
+.dark-theme .no-data-card,
+.dark-theme .mcq-card,
+.dark-theme .question-item,
+.dark-theme .answer-summary,
+.dark-theme .explanation-section {
+  background: var(--card-bg, #0f1724) !important;
+  color: var(--text-color) !important;
+  border-color: var(--muted-border, rgba(255,255,255,0.06)) !important;
+  box-shadow: 0 2px 12px rgba(2,6,23,0.6) !important;
+}
+
+/* Make sure text in dark theme is light */
+.dark-theme,
+.dark-theme body,
+.dark-theme .main-content,
+.dark-theme .app-header,
+.dark-theme .app-footer {
+  color: var(--text-color) !important;
+  background-color: var(--page-bg) !important;
+}
+
+/* Controls and inputs */
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select,
+.dark-theme .mat-mdc-form-field .mat-mdc-form-field-wrapper {
+  background: var(--surface) !important;
+  color: var(--text-color) !important;
+  border-color: var(--muted-border) !important;
+}
+
+/* Buttons tweaks for dark theme */
+.dark-theme .mat-mdc-raised-button {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
 
 body {
   margin: 0;

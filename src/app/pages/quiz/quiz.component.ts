@@ -367,15 +367,25 @@ export class QuizComponent implements OnInit {
       }
     });
 
-    // Store results and navigate
-    sessionStorage.setItem('quizResults', JSON.stringify({
+    const quizResult = {
       topic: this.topic,
       score,
       total: this.questions.length,
       percentage: Math.round((score / this.questions.length) * 100),
       answers: this.selectedAnswers,
-      questions: this.questions
-    }));
+      questions: this.questions,
+      num_questions: this.questions.length,
+      status: 'completed'
+    };
+
+    // Store results locally for immediate review
+    sessionStorage.setItem('quizResults', JSON.stringify(quizResult));
+
+    // Persist the exam history for authenticated users
+    this.mcqService.saveQuizHistory(quizResult).subscribe({
+      next: () => console.log('Quiz history saved'),
+      error: (err) => console.warn('Could not save quiz history', err)
+    });
 
     this.router.navigate(['/results']);
   }

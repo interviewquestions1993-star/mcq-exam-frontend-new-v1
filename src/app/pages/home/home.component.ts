@@ -175,6 +175,18 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
           </div>
         </div>
       </div>
+
+      <!-- View Persisted MCQs Section -->
+      <div class="persisted-mcqs-section">
+        <div class="persisted-card">
+          <div class="persisted-icon">📚</div>
+          <h3>Your MCQ Library</h3>
+          <p>View all the MCQ questions you've generated and saved</p>
+          <button mat-raised-button color="accent" (click)="viewPersistedMCQs()">
+            📖 View My Library
+          </button>
+        </div>
+      </div>
     </div>
   `,
   styleUrls: ['./home.component.css']
@@ -271,7 +283,8 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/topics', topicName]);
     }
   }
+
+  viewPersistedMCQs() {
+    this.router.navigate(['/persisted-mcqs']);
+  }
 }
-
-
-
