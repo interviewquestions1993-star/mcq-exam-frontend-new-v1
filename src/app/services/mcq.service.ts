@@ -17,6 +17,7 @@ export interface MCQResponse {
   num_questions: number;
   questions: MCQQuestion[];
   status: string;
+  message?: string;
 }
 
 export interface QuizHistoryRecord {
@@ -41,17 +42,33 @@ export class MCQService {
   }
 
   private getApiUrl(): string {
-    // Use environment variable for deployed version, fallback to Render backend if not set
-    const baseUrl = (window as any).__API_URL__ || 'https://mcq-exam-backend-new-v1.onrender.com';
+    const baseUrl = this.getBaseUrl();
     return `${baseUrl}/api/mcq/generate`;
   }
 
+  private getCbseApiUrl(): string {
+    const baseUrl = this.getBaseUrl();
+    return `${baseUrl}/api/mcq/cbse`;
+  }
+
   generateQuestions(topic: string, numQuestions: number = 5, difficulty?: string): Observable<MCQResponse> {
-    const payload = {
+    const lowerTopic = (topic || '').toLowerCase();
+    const payload: any = {
       topic,
       num_questions: numQuestions,
       difficulty: difficulty || null
     };
+
+    if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
+      return this.http.post<MCQResponse>(this.getCbseApiUrl(), payload);
+    }
+
+    if (lowerTopic.includes('science') && lowerTopic.includes('cbse')) {
+      payload.source = 'https://ncert.nic.in/textbook.php?hecu1=0-13';
+    } else if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
+      payload.source = 'NCERT, DIKSHA(https://diksha.gov.in/search/Library/)';
+    }
+
     return this.http.post<MCQResponse>(this.getApiUrl(), payload);
   }
 

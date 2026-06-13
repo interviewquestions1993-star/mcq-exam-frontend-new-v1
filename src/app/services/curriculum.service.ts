@@ -11,6 +11,7 @@ export interface Subject {
   id: string;
   name: string;
   chapters: Chapter[];
+  bookName?: string;
 }
 
 export interface ClassCurriculum {

@@ -109,20 +109,6 @@ interface TopicConcept {
             <input
               type="radio"
               name="questionCount"
-              [value]="5"
-              [(ngModel)]="questionCount"
-              class="count-input"
-            />
-            <div class="pill-content">
-              <span class="pill-label">5 Questions</span>
-              <span class="pill-subtitle">Default quick set</span>
-            </div>
-          </label>
-
-          <label class="count-pill">
-            <input
-              type="radio"
-              name="questionCount"
               [value]="10"
               [(ngModel)]="questionCount"
               class="count-input"
@@ -130,6 +116,34 @@ interface TopicConcept {
             <div class="pill-content">
               <span class="pill-label">10 Questions</span>
               <span class="pill-subtitle">Full practice set</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="20"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">20 Questions</span>
+              <span class="pill-subtitle">Extended practice</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="30"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">30 Questions</span>
+              <span class="pill-subtitle">Marathon test</span>
             </div>
           </label>
         </div>
@@ -192,7 +206,7 @@ export class TopicSelectionComponent implements OnInit {
   error = '';
   useCustomTopics = false;
   customTopics = '';
-  questionCount = 5;
+  questionCount = 10;
 
   get selectedConcepts(): TopicConcept[] {
     return this.concepts.filter(c => c.selected);

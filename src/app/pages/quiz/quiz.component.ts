@@ -156,7 +156,7 @@ export class QuizComponent implements OnInit {
   questions: QuizQuestion[] = [];
   currentIndex = 0;
   isLoading = false;
-  targetQuestionCount = 5;
+  targetQuestionCount = 10;
   loadProgress = 0;
   busyMessage = '';
   private loadingInterval: any;
@@ -181,30 +181,28 @@ export class QuizComponent implements OnInit {
   ngOnInit() {
     this.topic = this.route.snapshot.paramMap.get('topic') || '';
     const countParam = Number(this.route.snapshot.queryParamMap.get('count'));
-    this.targetQuestionCount = [5, 10].includes(countParam) ? countParam : 5;
+    this.targetQuestionCount = [10, 20, 30].includes(countParam) ? countParam : 10;
     this.loadQuestions();
   }
 
   loadQuestions() {
+    // Fetch all requested questions in a single request instead of batching.
     this.isLoading = true;
     this.error = '';
     this.startLoadingProgress();
-    
-    // Load initial 2 questions
-    this.mcqService.generateQuestions(this.topic, 2).subscribe({
+
+    this.mcqService.generateQuestions(this.topic, this.targetQuestionCount).subscribe({
       next: (response: MCQResponse) => {
+        // Check if chapter is not available
+        if (response.status === 'chapter_not_available') {
+          this.error = response.message || 'This chapter is not yet available. Please try another chapter.';
+          this.stopLoadingProgress();
+          this.isLoading = false;
+          return;
+        }
         this.questions = this.mapQuestions(response.questions || []);
         this.completeLoadingProgress();
         this.isLoading = false;
-
-        const missingQuestions = Math.max(0, 2 - this.questions.length);
-        if (missingQuestions > 0) {
-          this.loadAdditionalQuestions(missingQuestions, true, () => {
-            this.startBackgroundFetchSequence();
-          });
-        } else {
-          this.startBackgroundFetchSequence();
-        }
       },
       error: (err) => {
         this.error = 'Failed to load questions. Please try again.';

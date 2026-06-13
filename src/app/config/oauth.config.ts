@@ -21,6 +21,6 @@ export const OAUTH2_CONFIG = {
   GOOGLE_SCOPES: ['profile', 'email'],
   
   // API endpoints (optional - for backend communication)
-  BACKEND_URL: 'http://localhost:8000',  // Change to your backend URL
+  BACKEND_URL: 'https://mcq-exam-backend-new-v1.onrender.com',  // Change to your backend URL
   AUTH_ENDPOINT: '/api/auth/google'
 };

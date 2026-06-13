@@ -11,6 +11,7 @@ export interface Subject {
   id: string;
   name: string;
   chapters: Chapter[];
+  bookName?: string;
 }
 
 export interface ClassCurriculum {
@@ -617,6 +618,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-math',
         name: 'Mathematics',
+        bookName: 'Ganitha prakash',
         chapters: [
           { id: 'c8-1', name: 'A Square and A Cube', chapterNumber: 1 },
           { id: 'c8-2', name: 'Power Play', chapterNumber: 2 },
@@ -637,6 +639,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-science',
         name: 'Science',
+        bookName: 'Curiosity',
         chapters: [
           { id: 'c8s-1', name: 'Exploring the Investigative World of Science', chapterNumber: 1 },
           { id: 'c8s-2', name: 'The Invisible Living World: Beyond Our Naked Eye', chapterNumber: 2 },
@@ -657,6 +660,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-english',
         name: 'English (Poorvi)',
+        bookName: 'Poorvi',
         chapters: [
           { id: 'c8e-1', name: 'The Wit that Won Hearts', chapterNumber: 1 },
           { id: 'c8e-2', name: 'A Concrete Example', chapterNumber: 2 },
@@ -678,6 +682,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-hindi',
         name: 'Hindi (Malhar)',
+        bookName: 'Malhar',
         chapters: [
           { id: 'c8h-1', name: 'स्वदेश (Svadesh)', chapterNumber: 1 },
           { id: 'c8h-2', name: 'दो गौरैया (Do Gauraiya)', chapterNumber: 2 },
@@ -694,6 +699,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-social-history',
         name: 'History (Our Past - III)',
+        bookName: 'Exploring society India and Beyond',
         chapters: [
           { id: 'c8ss-1', name: 'How, When and Where', chapterNumber: 1 },
           { id: 'c8ss-2', name: 'From Trade to Territory', chapterNumber: 2 },
@@ -711,6 +717,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-social-geography',
         name: 'Geography (Resources and Development)',
+        bookName: 'Exploring society India and Beyond',
         chapters: [
           { id: 'c8sg-1', name: 'Resources', chapterNumber: 1 },
           { id: 'c8sg-2', name: 'Land, Soil, Water, Natural Vegetation and Wildlife Resources', chapterNumber: 2 },
@@ -723,6 +730,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-social-civics',
         name: 'Civics (Social and Political Life - III)',
+        bookName: 'Exploring society India and Beyond',
         chapters: [
           { id: 'c8sc-1', name: 'The Indian Constitution', chapterNumber: 1 },
           { id: 'c8sc-2', name: 'Understanding Secularism', chapterNumber: 2 },
@@ -739,6 +747,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
       {
         id: 'class8-social-studies',
         name: 'Social Science (Integrated)',
+        bookName: 'Exploring society India and Beyond',
         chapters: [
           { id: 'c8so-1', name: 'Natural Resources and Their Use', chapterNumber: 1 },
           { id: 'c8so-2', name: "Reshaping India's Political Map", chapterNumber: 2 },

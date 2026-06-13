@@ -119,6 +119,7 @@ interface PersistedMCQ {
                     <span class="option-letter">{{ getOptionLabel(oIdx) }}</span>
                     <span class="option-text">{{ getOptionText(option) }}</span>
                     <span *ngIf="isCorrectOption(option, question)" class="correct-indicator">✅ Correct</span>
+                    <span *ngIf="isSelectedOption(option, question, mcq) && !isCorrectOption(option, question)" class="wrong-indicator">❌ Incorrect</span>
                   </div>
                 </div>
 
@@ -335,6 +336,18 @@ interface PersistedMCQ {
       border-color: #4f8cff;
     }
 
+    .option-item.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .wrong-indicator {
+      color: #dc3545;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
     .score-badge {
       background: rgba(255, 255, 255, 0.2);
       padding: 4px 12px;
@@ -472,6 +485,17 @@ export class PersistedMcqsComponent implements OnInit {
     return false;
   }
 
+  isSelectedOption(option: string, question: MCQQuestion, mcq?: PersistedMCQ): boolean {
+    const selected = mcq ? this.getSelectedAnswer(question, mcq) : null;
+    if (!selected) return false;
+
+    // option strings are like 'A) Option text' — compare by option letter
+    const idx = question.options.indexOf(option);
+    if (idx < 0) return false;
+    const letter = this.getOptionLabel(idx);
+    return selected.trim().toUpperCase() === letter;
+  }
+
   getSelectedAnswer(question: MCQQuestion, mcq: PersistedMCQ): string | null {
     if (!mcq.answers) {
       return null;
@@ -498,13 +522,16 @@ export class PersistedMcqsComponent implements OnInit {
   }
 
   getOptionClass(option: string, question: MCQQuestion, mcq?: PersistedMCQ): string {
-    const selectedAnswer = mcq ? this.getSelectedAnswer(question, mcq) : null;
     const classNames = ['option-item'];
     if (this.isCorrectOption(option, question)) {
       classNames.push('correct');
     }
-    if (selectedAnswer && option.startsWith(selectedAnswer)) {
+    if (this.isSelectedOption(option, question, mcq)) {
       classNames.push('selected');
+      // mark wrong if selected but not correct
+      if (!this.isCorrectOption(option, question)) {
+        classNames.push('wrong');
+      }
     }
     return classNames.join(' ');
   }

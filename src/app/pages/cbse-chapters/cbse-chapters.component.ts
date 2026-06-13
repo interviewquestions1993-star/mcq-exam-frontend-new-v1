@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -28,7 +28,7 @@ interface ChapterItem {
     FormsModule,
     MatButtonModule,
     MatCardModule,
-    MatCheckboxModule,
+    MatRadioModule,
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule
@@ -58,14 +58,12 @@ interface ChapterItem {
           <p>No chapters found for {{ subjectDisplayName || 'this subject' }}.</p>
         </div>
         <div class="chapters-grid" *ngIf="chapters.length > 0">
-          <mat-card *ngFor="let chapter of chapters" class="chapter-card" [class.selected]="chapter.selected">
+          <mat-card *ngFor="let chapter of chapters" class="chapter-card" [class.selected]="chapter.id === selectedChapterId">
             <mat-card-content>
               <div class="chapter-header">
-                <mat-checkbox
-                  [(ngModel)]="chapter.selected"
-                  (change)="onChapterToggle(chapter)"
-                  color="primary"
-                ></mat-checkbox>
+                  <label class="chapter-radio">
+                    <input type="radio" name="chapterSelect" [(ngModel)]="selectedChapterId" [value]="chapter.id" (change)="onChapterSelect(chapter)" />
+                  </label>
                 <div class="chapter-info">
                   <h3>{{ chapter.name }}</h3>
                   <p>{{ chapter.description }}</p>
@@ -81,20 +79,6 @@ interface ChapterItem {
             <input
               type="radio"
               name="questionCount"
-              [value]="5"
-              [(ngModel)]="questionCount"
-              class="count-input"
-            />
-            <div class="pill-content">
-              <span class="pill-label">5 Questions</span>
-              <span class="pill-subtitle">Default quick set</span>
-            </div>
-          </label>
-
-          <label class="count-pill">
-            <input
-              type="radio"
-              name="questionCount"
               [value]="10"
               [(ngModel)]="questionCount"
               class="count-input"
@@ -104,34 +88,46 @@ interface ChapterItem {
               <span class="pill-subtitle">Full practice set</span>
             </div>
           </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="20"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">20 Questions</span>
+              <span class="pill-subtitle">Extended practice</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="30"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">30 Questions</span>
+              <span class="pill-subtitle">Marathon test</span>
+            </div>
+          </label>
         </div>
 
         <!-- Action Buttons -->
         <div class="action-buttons">
           <button
-            mat-stroked-button
-            color="primary"
-            class="action-button select-all-button"
-            (click)="selectAll()"
-          >
-            Select All
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            class="action-button clear-all-button"
-            (click)="clearAll()"
-          >
-            Clear All
-          </button>
-          <button
             mat-raised-button
             color="primary"
             class="action-button start-quiz-button"
-            [disabled]="selectedChapters.length === 0"
+            [disabled]="!selectedChapterId"
             (click)="startQuiz()"
           >
-            Start Quiz ({{ selectedChapters.length }} chapters)
+            Start Quiz
           </button>
         </div>
       </div>
@@ -144,12 +140,15 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
   subjectKey = '';
   subjectDisplayName = '';
   chapters: ChapterItem[] = [];
-  questionCount = 5;
+  questionCount = 10;
   isLoading$ = new BehaviorSubject<boolean>(false);
+  selectedChapterId: string | null = null;
   private destroy$ = new Subject<void>();
 
   get selectedChapters(): ChapterItem[] {
-    return this.chapters.filter(c => c.selected);
+    if (!this.selectedChapterId) return [];
+    const found = this.chapters.find(c => c.id === this.selectedChapterId);
+    return found ? [found] : [];
   }
 
   constructor(
@@ -185,6 +184,7 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
               description: `NCERT syllabus chapter`,
               selected: false
             }));
+            // bookName is stored in the curriculum data for the subject
           } else {
             // Fallback for subjects not in curriculum
             this.subjectDisplayName = this.subjectKey.replace(/-/g, ' ');
@@ -205,29 +205,21 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
       });
   }
 
-  onChapterToggle(chapter: ChapterItem) {
-    // Optional: Add any logic when a chapter is toggled
-  }
-
-  selectAll() {
-    this.chapters.forEach(chapter => chapter.selected = true);
-  }
-
-  clearAll() {
-    this.chapters.forEach(chapter => chapter.selected = false);
+  onChapterSelect(chapter: ChapterItem) {
+    this.selectedChapterId = chapter.id;
   }
 
   startQuiz() {
-    if (this.selectedChapters.length === 0) {
-      this.snackBar.open('Please select at least one chapter to start the quiz.', 'Close', {
+    if (!this.selectedChapterId) {
+      this.snackBar.open('Please select a chapter to start the quiz.', 'Close', {
         duration: 3000
       });
       return;
     }
 
-    const selectedChapterNames = this.selectedChapters.map(c => c.name);
+    const selected = this.chapters.find(c => c.id === this.selectedChapterId);
+    const selectedChapterNames = selected ? [selected.name] : [];
     const quizTopic = `CBSE Class ${this.classNumber} ${this.subjectDisplayName}: ${selectedChapterNames.join(', ')}`;
-
     this.router.navigate(['/quiz', quizTopic], {
       queryParams: { count: this.questionCount }
     });
