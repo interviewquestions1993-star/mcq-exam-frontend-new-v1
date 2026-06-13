@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Block access to admin areas (if any)
+Disallow: /admin/
+Disallow: /api/admin/
+
+# Block access to private areas
+Disallow: /private/
+Disallow: /internal/
+
+# Allow crawling of main content
+Allow: /about
+Allow: /contact
+Allow: /quiz/
+Allow: /topics/
+Allow: /cbse/
+
+# Sitemap
+Sitemap: https://www.ai-mcq-trainer.in/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
