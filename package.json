@@ -21,8 +21,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "seo-check": "echo 'SEO optimizations applied successfully'",
-    "deploy": "ng build --configuration production && npx angular-cli-ghpages --dir=dist/mcq-exam-preparer",
-    "deploy:seo": "npm run build:seo && npx angular-cli-ghpages --dir=dist/mcq-exam-preparer"
+    "deploy": "ng build --configuration production --base-href /mcq-exam-frontend-new-v1/ && npx angular-cli-ghpages --dir=dist/mcq-exam-preparer",
+    "deploy:seo": "npm run build:seo -- --base-href /mcq-exam-frontend-new-v1/ && npx angular-cli-ghpages --dir=dist/mcq-exam-preparer"
   },
   "private": true,
   "dependencies": {
