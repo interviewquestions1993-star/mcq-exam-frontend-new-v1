@@ -349,6 +349,39 @@ export class QuizComponent implements OnInit {
     return Math.round(((this.currentIndex + 1) / this.questions.length) * 100);
   }
 
+  private normalizeAnswer(answer: string | undefined | null): string {
+    return String(answer || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[\.\)]/g, '')
+      .toUpperCase();
+  }
+
+  private normalizeOptionText(text: string): string {
+    return String(text || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[\.\)]/g, '')
+      .toUpperCase();
+  }
+
+  private getOptionLetterForText(question: MCQQuestion, answerText: string): string | null {
+    const normalizedAnswer = this.normalizeAnswer(answerText);
+    if (!normalizedAnswer) {
+      return null;
+    }
+
+    for (let i = 0; i < question.options.length; i++) {
+      const optionLabel = this.getOptionLabel(i);
+      const optionText = this.normalizeOptionText(question.options[i]);
+      if (normalizedAnswer === optionText || normalizedAnswer === optionLabel || optionText.includes(normalizedAnswer) || normalizedAnswer.includes(optionText)) {
+        return optionLabel;
+      }
+    }
+
+    return null;
+  }
+
   private mapQuestions(questions: MCQQuestion[]): QuizQuestion[] {
     return questions.map((question, index) => ({
       ...question,
@@ -360,19 +393,34 @@ export class QuizComponent implements OnInit {
     // Calculate score
     let score = 0;
     this.questions.forEach(question => {
-      if (this.selectedAnswers[question.localId] === question.correct_answer) {
+      const selectedRaw = this.selectedAnswers[question.localId];
+      const selected = this.normalizeAnswer(selectedRaw);
+      const selectedLetter = selected ? selected.charAt(0) : '';
+      const selectedText = selected ? this.normalizeOptionText(selectedRaw || '') : '';
+
+      const correctRaw = question.correct_answer;
+      const correctText = this.normalizeAnswer(correctRaw);
+      const correctLetter = this.getOptionLetterForText(question, correctRaw);
+
+      if (selected && correctLetter && selectedLetter === correctLetter) {
+        score++;
+        return;
+      }
+
+      if (selectedText && correctText && selectedText === correctText) {
         score++;
       }
     });
 
+    const total = this.questions.length;
     const quizResult = {
       topic: this.topic,
       score,
-      total: this.questions.length,
-      percentage: Math.round((score / this.questions.length) * 100),
+      total,
+      percentage: total > 0 ? Math.round((score / total) * 100) : 0,
       answers: this.selectedAnswers,
       questions: this.questions,
-      num_questions: this.questions.length,
+      num_questions: total,
       status: 'completed'
     };
 

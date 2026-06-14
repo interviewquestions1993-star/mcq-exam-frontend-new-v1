@@ -72,12 +72,12 @@ interface QuizResults {
             <div
               *ngFor="let question of results.questions"
               class="answer-item"
-              [ngClass]="{ 'correct': results.answers[question.localId || question.id] === question.correct_answer, 'incorrect': results.answers[question.localId || question.id] !== question.correct_answer }"
+              [ngClass]="{ 'correct': isCorrectAnswer(question), 'incorrect': !isCorrectAnswer(question) }"
             >
               <div class="answer-header">
                 <div class="answer-status">
-                  <span class="answer-emoji" *ngIf="results.answers[question.localId || question.id] === question.correct_answer">✅</span>
-                  <span class="answer-emoji" *ngIf="results.answers[question.localId || question.id] !== question.correct_answer">❌</span>
+                  <span class="answer-emoji" *ngIf="isCorrectAnswer(question)">✅</span>
+                  <span class="answer-emoji" *ngIf="!isCorrectAnswer(question)">❌</span>
                 </div>
                 <h4>{{ question.question }}</h4>
               </div>
@@ -123,7 +123,14 @@ export class ResultsComponent implements OnInit {
     const resultsStr = sessionStorage.getItem('quizResults');
     if (resultsStr) {
       this.results = JSON.parse(resultsStr);
+      if (this.results && (!Number.isFinite(this.results.percentage) || this.results.percentage < 0 || this.results.percentage > 100)) {
+        this.results.percentage = this.calculatePercentage(this.results.score, this.results.total);
+      }
     }
+  }
+
+  private calculatePercentage(score: number, total: number): number {
+    return total > 0 ? Math.round((score / total) * 100) : 0;
   }
 
   getGrade(percentage: number): string {
@@ -154,6 +161,72 @@ export class ResultsComponent implements OnInit {
       sessionStorage.removeItem('quizResults');
       this.router.navigate(['/quiz', this.results.topic]);
     }
+  }
+
+  private normalizeAnswer(answer: string | null | undefined): string {
+    return String(answer || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[\.\)]/g, '')
+      .toUpperCase();
+  }
+
+  private normalizeOptionText(text: string): string {
+    return String(text || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[\.\)]/g, '')
+      .toUpperCase();
+  }
+
+  private getOptionLetterForText(question: any, answerText: string): string | null {
+    const normalizedAnswer = this.normalizeAnswer(answerText);
+    if (!normalizedAnswer) {
+      return null;
+    }
+
+    for (let i = 0; i < question.options.length; i++) {
+      const optionLabel = String.fromCharCode(65 + i);
+      const optionText = this.normalizeOptionText(question.options[i]);
+      if (
+        normalizedAnswer === optionText ||
+        normalizedAnswer === optionLabel ||
+        optionText.includes(normalizedAnswer) ||
+        normalizedAnswer.includes(optionText)
+      ) {
+        return optionLabel;
+      }
+    }
+
+    return null;
+  }
+
+  isCorrectAnswer(question: any): boolean {
+    if (!this.results) {
+      return false;
+    }
+
+    const answerKey = question.localId || question.id;
+    const selectedRaw = this.results.answers?.[answerKey] || null;
+    const selected = this.normalizeAnswer(selectedRaw);
+    const correctRaw = question.correct_answer || '';
+    const correctText = this.normalizeAnswer(correctRaw);
+    const correctLetter = this.getOptionLetterForText(question, correctRaw);
+
+    if (selected && correctLetter && selected.charAt(0) === correctLetter) {
+      return true;
+    }
+
+    if (selected && correctText && selected === correctText) {
+      return true;
+    }
+
+    const selectedText = selected ? this.normalizeOptionText(selectedRaw || '') : '';
+    if (selectedText && correctText && selectedText === correctText) {
+      return true;
+    }
+
+    return false;
   }
 
   getAnswerLabelWithText(question: any, answer: string | null): string | null {
