@@ -99,7 +99,7 @@ interface TopicAnalytics {
             <mat-card class="analytics-card">
               <div class="analytics-card-title">Average Percentage</div>
               <div class="analytics-card-value">{{ averagePercentage | number:'1.0-0' }}%</div>
-              <div class="analytics-card-subtitle">Average across all attempts</div>
+              <div class="analytics-card-subtitle">Average across all attempts (actual percentages calculated)</div>
             </mat-card>
             <mat-card class="analytics-card">
               <div class="analytics-card-title">Pass Rate</div>
@@ -115,9 +115,9 @@ interface TopicAnalytics {
                 <div *ngFor="let subject of subjectAnalytics" class="chart-row">
                   <div class="chart-row-label">{{ subject.label }}</div>
                   <div class="chart-bar-track">
-                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(subject.passRate)"></div>
+                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(subject.averagePercentage)"></div>
                   </div>
-                  <div class="chart-row-value">{{ subject.passRate | number:'1.0-0' }}%</div>
+                  <div class="chart-row-value">{{ subject.averagePercentage | number:'1.0-0' }}%</div>
                 </div>
               </div>
               <ng-template #noSubjectData>
@@ -131,9 +131,9 @@ interface TopicAnalytics {
                 <div *ngFor="let chapter of chapterAnalytics" class="chart-row">
                   <div class="chart-row-label">{{ chapter.label }}</div>
                   <div class="chart-bar-track">
-                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(chapter.passRate)"></div>
+                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(chapter.averagePercentage)"></div>
                   </div>
-                  <div class="chart-row-value">{{ chapter.passRate | number:'1.0-0' }}%</div>
+                  <div class="chart-row-value">{{ chapter.averagePercentage | number:'1.0-0' }}%</div>
                 </div>
               </div>
               <ng-template #noChapterData>
@@ -170,7 +170,7 @@ interface TopicAnalytics {
 
                 <div class="answer-summary">
                   <p><strong>Your Answer:</strong> {{ getAnswerLabelWithText(question, getSelectedAnswer(question, mcq)) || 'Not answered' }}</p>
-                  <p *ngIf="getSelectedAnswer(question, mcq) !== question.correct_answer">
+                  <p *ngIf="!areAnswersEquivalent(getSelectedAnswer(question, mcq), question.correct_answer, question)">
                     <strong>Correct Answer:</strong> {{ getAnswerLabelWithText(question, question.correct_answer) || question.correct_answer }}
                   </p>
                 </div>
@@ -598,9 +598,7 @@ export class PersistedMcqsComponent implements OnInit {
   isAuthenticated = false;
   totalAttempts = 0;
   totalQuestions = 0;
-  averageScore = 0;
   averagePercentage = 0;
-  averageQuestionsPerAttempt = 0;
   passRate = 0;
   subjectAnalytics: TopicAnalytics[] = [];
   chapterAnalytics: TopicAnalytics[] = [];
@@ -647,32 +645,69 @@ export class PersistedMcqsComponent implements OnInit {
   }
 
   getOptionText(option: string): string {
-    // Remove the letter prefix if it exists (e.g., "A) Option" -> "Option")
-    return option.replace(/^[A-D]\)\s*/, '');
+    return option.replace(/^[A-D][\)\.\:]\s*/i, '').trim();
+  }
+
+  private normalizeOptionText(text: string | null | undefined): string {
+    return this.getOptionText(String(text || ''))
+      .replace(/\s+/g, ' ')
+      .toLowerCase();
   }
 
   private normalizeAnswerLetter(answer: string | null | undefined): string | null {
     if (!answer) return null;
     const trimmed = answer.toString().trim();
-    const m = trimmed.match(/^([A-D])/i);
+    const m = trimmed.match(/^([A-D])(?:[\)\.\:]\s*|$)/i);
     if (m) return m[1].toUpperCase();
     return null;
+  }
+
+  private getOptionLetterForAnswer(question: MCQQuestion, answer: string | null | undefined): string | null {
+    if (!answer) return null;
+    const letter = this.normalizeAnswerLetter(answer);
+    if (letter) {
+      return letter;
+    }
+
+    const normalizedAnswer = this.normalizeOptionText(answer);
+    if (!normalizedAnswer) {
+      return null;
+    }
+
+    for (let i = 0; i < question.options.length; i++) {
+      const optionNormalized = this.normalizeOptionText(question.options[i]);
+      if (optionNormalized === normalizedAnswer) {
+        return this.getOptionLabel(i);
+      }
+    }
+
+    return null;
+  }
+
+  areAnswersEquivalent(answerA: string | null | undefined, answerB: string | null | undefined, question: MCQQuestion): boolean {
+    const letterA = this.getOptionLetterForAnswer(question, answerA);
+    const letterB = this.getOptionLetterForAnswer(question, answerB);
+    if (letterA && letterB) {
+      return letterA === letterB;
+    }
+
+    const normalizedA = this.normalizeOptionText(answerA);
+    const normalizedB = this.normalizeOptionText(answerB);
+    return normalizedA !== '' && normalizedA === normalizedB;
   }
 
   isCorrectOption(option: string, question: MCQQuestion): boolean {
     const idx = question.options.indexOf(option);
     const optionLetter = idx >= 0 ? this.getOptionLabel(idx) : null;
+    const correctLetter = this.getOptionLetterForAnswer(question, question.correct_answer);
 
-    const normalizedCorrect = this.normalizeAnswerLetter(question.correct_answer as any);
-    if (normalizedCorrect && optionLetter) {
-      return normalizedCorrect === optionLetter;
+    if (correctLetter && optionLetter) {
+      return correctLetter === optionLetter;
     }
 
-    // Fallback: compare option text (without leading letter) to stored correct answer text
-    const correctText = (question.correct_answer || '').toString();
-    const normCorrectText = this.getOptionText(correctText).trim().toLowerCase();
-    const normOptionText = this.getOptionText(option).trim().toLowerCase();
-    return normCorrectText === normOptionText;
+    const normCorrectText = this.normalizeOptionText(question.correct_answer || '');
+    const normOptionText = this.normalizeOptionText(option);
+    return normCorrectText !== '' && normCorrectText === normOptionText;
   }
 
   isSelectedOption(option: string, question: MCQQuestion, mcq?: PersistedMCQ): boolean {
@@ -680,22 +715,16 @@ export class PersistedMcqsComponent implements OnInit {
     if (!selected) return false;
 
     const idx = question.options.indexOf(option);
-    const letter = idx >= 0 ? this.getOptionLabel(idx) : null;
+    const optionLetter = idx >= 0 ? this.getOptionLabel(idx) : null;
+    const selectedLetter = this.getOptionLetterForAnswer(question, selected);
 
-    const selectedLetter = this.normalizeAnswerLetter(selected);
-    if (selectedLetter && letter) {
-      return selectedLetter === letter;
+    if (selectedLetter && optionLetter) {
+      return selectedLetter === optionLetter;
     }
 
-    // Fallback: selected may be full option text (with or without leading letter)
-    const selText = selected.toString().trim().toLowerCase();
-    const optText = option.toString().trim().toLowerCase();
-    if (selText === optText) return true;
-
-    // Compare normalized option text (without leading A) ) to capture forms like 'A) Option' vs 'Option'
-    if (this.getOptionText(option).trim().toLowerCase() === selText) return true;
-
-    return false;
+    const normalizedSelected = this.normalizeOptionText(selected);
+    const normalizedOption = this.normalizeOptionText(option);
+    return normalizedSelected !== '' && normalizedSelected === normalizedOption;
   }
 
   getSelectedAnswer(question: MCQQuestion, mcq: PersistedMCQ): string | null {
@@ -712,15 +741,16 @@ export class PersistedMcqsComponent implements OnInit {
       return null;
     }
 
-    const label = answer.trim().toUpperCase();
-    const index = label.charCodeAt(0) - 65;
-    const optionText = question?.options?.[index];
-
-    if (optionText) {
-      return `${label}. ${optionText}`;
+    const optionLetter = this.getOptionLetterForAnswer(question, answer);
+    if (optionLetter) {
+      const index = optionLetter.charCodeAt(0) - 65;
+      const optionText = question?.options?.[index];
+      if (optionText) {
+        return `${optionLetter}. ${this.getOptionText(optionText)}`;
+      }
     }
 
-    return answer;
+    return this.getOptionText(answer).trim() || answer.trim();
   }
 
   getOptionClass(option: string, question: MCQQuestion, mcq?: PersistedMCQ): string {
@@ -778,17 +808,15 @@ export class PersistedMcqsComponent implements OnInit {
     const subjectMap = new Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number; }>();
     const chapterMap = new Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number; }>();
 
-    let totalScore = 0;
+    let totalPercentage = 0;
     let passedCount = 0;
     let questionCount = 0;
-    let totalPercentage = 0;
 
     validMcqs.forEach((mcq) => {
       const percentage = typeof mcq.percentage === 'number' ? mcq.percentage : mcq.total > 0 ? Math.round((mcq.score / mcq.total) * 100) : 0;
       const passed = percentage >= 60;
-      totalScore += mcq.score || 0;
-      questionCount += mcq.total || 0;
       totalPercentage += percentage;
+      questionCount += mcq.total || 0;
       if (passed) {
         passedCount += 1;
       }
@@ -800,9 +828,7 @@ export class PersistedMcqsComponent implements OnInit {
 
     this.totalAttempts = validMcqs.length;
     this.totalQuestions = questionCount;
-    this.averageScore = validMcqs.length > 0 ? totalScore / validMcqs.length : 0;
     this.averagePercentage = validMcqs.length > 0 ? totalPercentage / validMcqs.length : 0;
-    this.averageQuestionsPerAttempt = validMcqs.length > 0 ? questionCount / validMcqs.length : 0;
     this.passRate = validMcqs.length > 0 ? (passedCount / validMcqs.length) * 100 : 0;
 
     this.subjectAnalytics = this.buildAnalyticsArray(subjectMap).sort((a, b) => b.passRate - a.passRate);

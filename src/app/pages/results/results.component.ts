@@ -234,15 +234,31 @@ export class ResultsComponent implements OnInit {
       return null;
     }
 
-    const label = answer.trim().toUpperCase();
-    const index = label.charCodeAt(0) - 65;
-    const optionText = question?.options?.[index];
+    const trimmed = answer.trim();
+    const firstChar = trimmed[0]?.toUpperCase();
 
-    if (optionText) {
-      return `${label}. ${optionText}`;
+    // If answer is a single letter (A-D), use it as index
+    if (firstChar && /^[A-D]$/.test(firstChar) && trimmed.length === 1) {
+      const index = firstChar.charCodeAt(0) - 65;
+      const optionText = question?.options?.[index];
+      if (optionText) {
+        return `${firstChar}. ${optionText}`;
+      }
     }
 
-    return answer;
+    // If answer is text, find matching option
+    if (question?.options) {
+      const answerLower = trimmed.toLowerCase();
+      for (let i = 0; i < question.options.length; i++) {
+        const optionLower = question.options[i].toLowerCase();
+        if (optionLower === answerLower || optionLower.includes(answerLower) || answerLower.includes(optionLower)) {
+          const letter = String.fromCharCode(65 + i);
+          return `${letter}. ${question.options[i]}`;
+        }
+      }
+    }
+
+    return trimmed;
   }
 }
 
