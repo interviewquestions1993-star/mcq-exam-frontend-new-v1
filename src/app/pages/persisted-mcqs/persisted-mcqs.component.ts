@@ -97,9 +97,9 @@ interface TopicAnalytics {
               <div class="analytics-card-subtitle">Attempts Completed</div>
             </mat-card>
             <mat-card class="analytics-card">
-              <div class="analytics-card-title">Average Score</div>
-              <div class="analytics-card-value">{{ averageScore | number:'1.0-1' }}/{{ totalQuestions }}</div>
-              <div class="analytics-card-subtitle">Avg. across all attempts</div>
+              <div class="analytics-card-title">Average Percentage</div>
+              <div class="analytics-card-value">{{ averagePercentage | number:'1.0-0' }}%</div>
+              <div class="analytics-card-subtitle">Average across all attempts</div>
             </mat-card>
             <mat-card class="analytics-card">
               <div class="analytics-card-title">Pass Rate</div>
@@ -599,6 +599,8 @@ export class PersistedMcqsComponent implements OnInit {
   totalAttempts = 0;
   totalQuestions = 0;
   averageScore = 0;
+  averagePercentage = 0;
+  averageQuestionsPerAttempt = 0;
   passRate = 0;
   subjectAnalytics: TopicAnalytics[] = [];
   chapterAnalytics: TopicAnalytics[] = [];
@@ -649,25 +651,51 @@ export class PersistedMcqsComponent implements OnInit {
     return option.replace(/^[A-D]\)\s*/, '');
   }
 
+  private normalizeAnswerLetter(answer: string | null | undefined): string | null {
+    if (!answer) return null;
+    const trimmed = answer.toString().trim();
+    const m = trimmed.match(/^([A-D])/i);
+    if (m) return m[1].toUpperCase();
+    return null;
+  }
+
   isCorrectOption(option: string, question: MCQQuestion): boolean {
-    for (let i = 0; i < question.options.length; i++) {
-      const optionLetter = this.getOptionLabel(i);
-      if (optionLetter === question.correct_answer && option === question.options[i]) {
-        return true;
-      }
+    const idx = question.options.indexOf(option);
+    const optionLetter = idx >= 0 ? this.getOptionLabel(idx) : null;
+
+    const normalizedCorrect = this.normalizeAnswerLetter(question.correct_answer as any);
+    if (normalizedCorrect && optionLetter) {
+      return normalizedCorrect === optionLetter;
     }
-    return false;
+
+    // Fallback: compare option text (without leading letter) to stored correct answer text
+    const correctText = (question.correct_answer || '').toString();
+    const normCorrectText = this.getOptionText(correctText).trim().toLowerCase();
+    const normOptionText = this.getOptionText(option).trim().toLowerCase();
+    return normCorrectText === normOptionText;
   }
 
   isSelectedOption(option: string, question: MCQQuestion, mcq?: PersistedMCQ): boolean {
     const selected = mcq ? this.getSelectedAnswer(question, mcq) : null;
     if (!selected) return false;
 
-    // option strings are like 'A) Option text' — compare by option letter
     const idx = question.options.indexOf(option);
-    if (idx < 0) return false;
-    const letter = this.getOptionLabel(idx);
-    return selected.trim().toUpperCase() === letter;
+    const letter = idx >= 0 ? this.getOptionLabel(idx) : null;
+
+    const selectedLetter = this.normalizeAnswerLetter(selected);
+    if (selectedLetter && letter) {
+      return selectedLetter === letter;
+    }
+
+    // Fallback: selected may be full option text (with or without leading letter)
+    const selText = selected.toString().trim().toLowerCase();
+    const optText = option.toString().trim().toLowerCase();
+    if (selText === optText) return true;
+
+    // Compare normalized option text (without leading A) ) to capture forms like 'A) Option' vs 'Option'
+    if (this.getOptionText(option).trim().toLowerCase() === selText) return true;
+
+    return false;
   }
 
   getSelectedAnswer(question: MCQQuestion, mcq: PersistedMCQ): string | null {
@@ -753,12 +781,14 @@ export class PersistedMcqsComponent implements OnInit {
     let totalScore = 0;
     let passedCount = 0;
     let questionCount = 0;
+    let totalPercentage = 0;
 
     validMcqs.forEach((mcq) => {
       const percentage = typeof mcq.percentage === 'number' ? mcq.percentage : mcq.total > 0 ? Math.round((mcq.score / mcq.total) * 100) : 0;
       const passed = percentage >= 60;
       totalScore += mcq.score || 0;
       questionCount += mcq.total || 0;
+      totalPercentage += percentage;
       if (passed) {
         passedCount += 1;
       }
@@ -771,6 +801,8 @@ export class PersistedMcqsComponent implements OnInit {
     this.totalAttempts = validMcqs.length;
     this.totalQuestions = questionCount;
     this.averageScore = validMcqs.length > 0 ? totalScore / validMcqs.length : 0;
+    this.averagePercentage = validMcqs.length > 0 ? totalPercentage / validMcqs.length : 0;
+    this.averageQuestionsPerAttempt = validMcqs.length > 0 ? questionCount / validMcqs.length : 0;
     this.passRate = validMcqs.length > 0 ? (passedCount / validMcqs.length) * 100 : 0;
 
     this.subjectAnalytics = this.buildAnalyticsArray(subjectMap).sort((a, b) => b.passRate - a.passRate);
