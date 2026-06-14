@@ -121,6 +121,48 @@ interface ChapterItem {
             <input
               type="radio"
               name="questionCount"
+              [value]="50"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">50 Questions</span>
+              <span class="pill-subtitle">Exam-style bundle</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="70"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">70 Questions</span>
+              <span class="pill-subtitle">Challenge mode</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="100"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">100 Questions</span>
+              <span class="pill-subtitle">Ultimate practice</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
               [value]="-1"
               [(ngModel)]="questionCount"
               class="count-input"

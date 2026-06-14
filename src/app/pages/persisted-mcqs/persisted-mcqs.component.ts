@@ -33,6 +33,14 @@ interface PersistedMCQ {
   status: string;
 }
 
+interface TopicAnalytics {
+  label: string;
+  attempts: number;
+  averagePercentage: number;
+  passRate: number;
+  averageScore: number;
+}
+
 @Component({
   selector: 'app-persisted-mcqs',
   standalone: true,
@@ -80,6 +88,60 @@ interface PersistedMCQ {
       <div *ngIf="!isLoading && getValidMCQs().length > 0" class="mcqs-display">
         <h1 class="page-title">📚 Your Exam History</h1>
         <p class="page-subtitle">Total Attempts: {{ getValidMCQs().length }}</p>
+
+        <div class="analytics-panel" *ngIf="getValidMCQs().length > 0">
+          <div class="analytics-cards">
+            <mat-card class="analytics-card">
+              <div class="analytics-card-title">Overall Performance</div>
+              <div class="analytics-card-value">{{ totalAttempts }}</div>
+              <div class="analytics-card-subtitle">Attempts Completed</div>
+            </mat-card>
+            <mat-card class="analytics-card">
+              <div class="analytics-card-title">Average Score</div>
+              <div class="analytics-card-value">{{ averageScore | number:'1.0-1' }}/{{ totalQuestions }}</div>
+              <div class="analytics-card-subtitle">Avg. across all attempts</div>
+            </mat-card>
+            <mat-card class="analytics-card">
+              <div class="analytics-card-title">Pass Rate</div>
+              <div class="analytics-card-value">{{ passRate | number:'1.0-0' }}%</div>
+              <div class="analytics-card-subtitle">Passed attempts</div>
+            </mat-card>
+          </div>
+
+          <div class="analytics-charts">
+            <mat-card class="analytics-chart-card">
+              <div class="chart-card-header">Subject Performance</div>
+              <div *ngIf="subjectAnalytics.length > 0; else noSubjectData">
+                <div *ngFor="let subject of subjectAnalytics" class="chart-row">
+                  <div class="chart-row-label">{{ subject.label }}</div>
+                  <div class="chart-bar-track">
+                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(subject.passRate)"></div>
+                  </div>
+                  <div class="chart-row-value">{{ subject.passRate | number:'1.0-0' }}%</div>
+                </div>
+              </div>
+              <ng-template #noSubjectData>
+                <p class="empty-chart-text">No subject-level history available yet.</p>
+              </ng-template>
+            </mat-card>
+
+            <mat-card class="analytics-chart-card">
+              <div class="chart-card-header">Chapter Performance</div>
+              <div *ngIf="chapterAnalytics.length > 0; else noChapterData">
+                <div *ngFor="let chapter of chapterAnalytics" class="chart-row">
+                  <div class="chart-row-label">{{ chapter.label }}</div>
+                  <div class="chart-bar-track">
+                    <div class="chart-bar-fill" [style.width]="getChartBarWidth(chapter.passRate)"></div>
+                  </div>
+                  <div class="chart-row-value">{{ chapter.passRate | number:'1.0-0' }}%</div>
+                </div>
+              </div>
+              <ng-template #noChapterData>
+                <p class="empty-chart-text">No chapter-level history available yet.</p>
+              </ng-template>
+            </mat-card>
+          </div>
+        </div>
 
         <div class="mcqs-list">
           <mat-card *ngFor="let mcq of getValidMCQs(); let idx = index" class="mcq-card">
@@ -199,6 +261,109 @@ interface PersistedMCQ {
       text-align: center;
       margin-bottom: 30px;
       font-size: 16px;
+    }
+
+    .analytics-panel {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 30px;
+      grid-template-columns: 1fr;
+    }
+
+    .analytics-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .analytics-card {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.14);
+      color: white;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      min-height: 140px;
+    }
+
+    .analytics-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-bottom: 12px;
+    }
+
+    .analytics-card-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .analytics-card-subtitle {
+      font-size: 13px;
+      opacity: 0.78;
+    }
+
+    .analytics-charts {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .analytics-chart-card {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.16);
+      color: white;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .chart-card-header {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 220px 70px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .chart-row-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.92);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chart-bar-track {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      height: 16px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .chart-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6ee7b7 0%, #3b82f6 100%);
+      border-radius: 12px 0 0 12px;
+      transition: width 0.35s ease;
+    }
+
+    .chart-row-value {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .empty-chart-text {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 14px;
+      margin: 0;
     }
 
     .mcqs-list {
@@ -431,6 +596,12 @@ export class PersistedMcqsComponent implements OnInit {
   mcqs: PersistedMCQ[] = [];
   isLoading = true;
   isAuthenticated = false;
+  totalAttempts = 0;
+  totalQuestions = 0;
+  averageScore = 0;
+  passRate = 0;
+  subjectAnalytics: TopicAnalytics[] = [];
+  chapterAnalytics: TopicAnalytics[] = [];
 
   constructor(
     private http: HttpClient,
@@ -458,6 +629,7 @@ export class PersistedMcqsComponent implements OnInit {
     this.http.get<PersistedMCQ[]>(apiUrl).subscribe(
       (data) => {
         this.mcqs = data;
+        this.computeAnalytics(data);
         this.isLoading = false;
       },
       (error) => {
@@ -571,5 +743,99 @@ export class PersistedMcqsComponent implements OnInit {
 
   refresh() {
     this.loadPersistedMCQs();
+  }
+
+  private computeAnalytics(mcqs: PersistedMCQ[]) {
+    const validMcqs = mcqs.filter((mcq) => this.hasValidQuestions(mcq));
+    const subjectMap = new Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number; }>();
+    const chapterMap = new Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number; }>();
+
+    let totalScore = 0;
+    let passedCount = 0;
+    let questionCount = 0;
+
+    validMcqs.forEach((mcq) => {
+      const percentage = typeof mcq.percentage === 'number' ? mcq.percentage : mcq.total > 0 ? Math.round((mcq.score / mcq.total) * 100) : 0;
+      const passed = percentage >= 60;
+      totalScore += mcq.score || 0;
+      questionCount += mcq.total || 0;
+      if (passed) {
+        passedCount += 1;
+      }
+
+      const { subject, chapter } = this.extractTopicMetadata(mcq.topic);
+      this.mergeAnalyticsEntry(subjectMap, subject, percentage, passed, mcq.score);
+      this.mergeAnalyticsEntry(chapterMap, chapter, percentage, passed, mcq.score);
+    });
+
+    this.totalAttempts = validMcqs.length;
+    this.totalQuestions = questionCount;
+    this.averageScore = validMcqs.length > 0 ? totalScore / validMcqs.length : 0;
+    this.passRate = validMcqs.length > 0 ? (passedCount / validMcqs.length) * 100 : 0;
+
+    this.subjectAnalytics = this.buildAnalyticsArray(subjectMap).sort((a, b) => b.passRate - a.passRate);
+    this.chapterAnalytics = this.buildAnalyticsArray(chapterMap).sort((a, b) => b.passRate - a.passRate);
+  }
+
+  private mergeAnalyticsEntry(
+    map: Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number }> ,
+    key: string,
+    percentage: number,
+    passed: boolean,
+    score: number
+  ) {
+    const existing = map.get(key) ?? { attempts: 0, percentageSum: 0, passCount: 0, scoreSum: 0 };
+    existing.attempts += 1;
+    existing.percentageSum += percentage;
+    existing.passCount += passed ? 1 : 0;
+    existing.scoreSum += score;
+    map.set(key, existing);
+  }
+
+  private buildAnalyticsArray(map: Map<string, { attempts: number; percentageSum: number; passCount: number; scoreSum: number }>): TopicAnalytics[] {
+    const result: TopicAnalytics[] = [];
+    for (const [label, entry] of map.entries()) {
+      result.push({
+        label,
+        attempts: entry.attempts,
+        averagePercentage: entry.attempts > 0 ? entry.percentageSum / entry.attempts : 0,
+        passRate: entry.attempts > 0 ? (entry.passCount / entry.attempts) * 100 : 0,
+        averageScore: entry.attempts > 0 ? entry.scoreSum / entry.attempts : 0
+      });
+    }
+    return result;
+  }
+
+  private extractTopicMetadata(topic: string): { subject: string; chapter: string } {
+    if (!topic || !topic.trim()) {
+      return { subject: 'Unknown Subject', chapter: 'Unknown Chapter' };
+    }
+
+    const rawTopic = topic.trim();
+    const colonIndex = rawTopic.indexOf(':');
+    if (colonIndex >= 0) {
+      return {
+        subject: rawTopic.slice(0, colonIndex).trim(),
+        chapter: rawTopic.slice(colonIndex + 1).trim() || rawTopic.slice(0, colonIndex).trim()
+      };
+    }
+
+    const separators = [' - ', ' | '];
+    for (const separator of separators) {
+      const separatorIndex = rawTopic.indexOf(separator);
+      if (separatorIndex >= 0) {
+        return {
+          subject: rawTopic.slice(0, separatorIndex).trim(),
+          chapter: rawTopic.slice(separatorIndex + separator.length).trim() || rawTopic.slice(0, separatorIndex).trim()
+        };
+      }
+    }
+
+    return { subject: rawTopic, chapter: rawTopic };
+  }
+
+  getChartBarWidth(value: number): string {
+    const normalized = Math.max(0, Math.min(100, value));
+    return `${normalized}%`;
   }
 }

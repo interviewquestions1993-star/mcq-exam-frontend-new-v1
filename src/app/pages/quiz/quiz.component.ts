@@ -183,7 +183,7 @@ export class QuizComponent implements OnInit {
   ngOnInit() {
     this.topic = this.route.snapshot.paramMap.get('topic') || '';
     const countParam = Number(this.route.snapshot.queryParamMap.get('count'));
-    this.targetQuestionCount = countParam === -1 ? -1 : [10, 20, 30].includes(countParam) ? countParam : 10;
+    this.targetQuestionCount = countParam === -1 ? -1 : [10, 20, 30, 50, 70, 100].includes(countParam) ? countParam : 10;
     this.loadQuestions();
   }
 
