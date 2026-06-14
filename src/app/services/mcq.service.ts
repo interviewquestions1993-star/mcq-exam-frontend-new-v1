@@ -29,6 +29,9 @@ export interface QuizHistoryRecord {
   total: number;
   percentage: number;
   status: string;
+  user_id?: string;
+  user_email?: string;
+  user_name?: string;
 }
 
 @Injectable({
@@ -58,6 +61,15 @@ export class MCQService {
       num_questions: numQuestions,
       difficulty: difficulty || null
     };
+
+    if (numQuestions < 0) {
+      if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
+        payload.num_questions = -1;
+      } else {
+        // For generic topic generation, use the maximum supported question count
+        payload.num_questions = 50;
+      }
+    }
 
     if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
       return this.http.post<MCQResponse>(this.getCbseApiUrl(), payload);

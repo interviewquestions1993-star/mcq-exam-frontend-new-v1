@@ -146,6 +146,20 @@ interface TopicConcept {
               <span class="pill-subtitle">Marathon test</span>
             </div>
           </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="questionCount"
+              [value]="-1"
+              [(ngModel)]="questionCount"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">All Questions</span>
+              <span class="pill-subtitle">Use full available pool</span>
+            </div>
+          </label>
         </div>
 
         <!-- Action Buttons -->

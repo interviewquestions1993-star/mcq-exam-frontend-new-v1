@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MCQService, MCQQuestion, MCQResponse } from '../../services/mcq.service';
+import { AuthService } from '../../services/auth.service';
 
 interface QuizQuestion extends MCQQuestion {
   localId: string;
@@ -175,31 +176,31 @@ export class QuizComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private mcqService: MCQService,
+    private authService: AuthService,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
     this.topic = this.route.snapshot.paramMap.get('topic') || '';
     const countParam = Number(this.route.snapshot.queryParamMap.get('count'));
-    this.targetQuestionCount = [10, 20, 30].includes(countParam) ? countParam : 10;
+    this.targetQuestionCount = countParam === -1 ? -1 : [10, 20, 30].includes(countParam) ? countParam : 10;
     this.loadQuestions();
   }
 
   loadQuestions() {
-    // Fetch all requested questions in a single request instead of batching.
     this.isLoading = true;
     this.error = '';
     this.startLoadingProgress();
 
     this.mcqService.generateQuestions(this.topic, this.targetQuestionCount).subscribe({
       next: (response: MCQResponse) => {
-        // Check if chapter is not available
         if (response.status === 'chapter_not_available') {
           this.error = response.message || 'This chapter is not yet available. Please try another chapter.';
           this.stopLoadingProgress();
           this.isLoading = false;
           return;
         }
+
         this.questions = this.mapQuestions(response.questions || []);
         this.completeLoadingProgress();
         this.isLoading = false;
@@ -209,32 +210,6 @@ export class QuizComponent implements OnInit {
         this.stopLoadingProgress();
         this.isLoading = false;
         console.error(err);
-      }
-    });
-  }
-
-  private loadAdditionalQuestions(numQuestions: number = 3, silent: boolean = false, callback?: () => void) {
-    this.moreQuestionsLoading = true;
-    this.startLoadingMoreAnimation();
-    this.mcqService.generateQuestions(this.topic, numQuestions).subscribe({
-      next: (response: MCQResponse) => {
-        const additional = this.mapQuestions(response.questions || []);
-        additional.forEach(question => this.questions.push(question));
-        this.moreQuestionsLoading = false;
-        this.stopLoadingMoreAnimation();
-        if (callback) {
-          callback();
-        }
-      },
-      error: (err) => {
-        if (!silent) {
-          console.error('Failed to load additional questions:', err);
-        }
-        this.moreQuestionsLoading = false;
-        this.stopLoadingMoreAnimation();
-        if (callback) {
-          callback();
-        }
       }
     });
   }
@@ -281,50 +256,6 @@ export class QuizComponent implements OnInit {
       clearInterval(this.loadingInterval);
       this.loadingInterval = null;
     }
-  }
-
-  private getBackgroundBatchSizes(): number[] {
-    return this.targetQuestionCount === 10 ? [2, 6] : [3];
-  }
-
-  private startBackgroundFetchSequence() {
-    const remaining = this.targetQuestionCount - this.questions.length;
-    if (remaining <= 0) {
-      return;
-    }
-    const batchSizes = this.getBackgroundBatchSizes();
-    this.loadBackgroundBatch(batchSizes, 0);
-  }
-
-  private loadBackgroundBatch(batchSizes: number[], index: number) {
-    const remaining = Math.max(0, this.targetQuestionCount - this.questions.length);
-    if (index >= batchSizes.length || remaining <= 0) {
-      this.moreQuestionsLoading = false;
-      this.stopLoadingMoreAnimation();
-      return;
-    }
-
-    const batchSize = Math.min(batchSizes[index], remaining);
-    this.moreQuestionsLoading = true;
-    this.startLoadingMoreAnimation();
-    this.mcqService.generateQuestions(this.topic, batchSize).subscribe({
-      next: (response: MCQResponse) => {
-        const additional = this.mapQuestions(response.questions || []);
-        additional.forEach(question => this.questions.push(question));
-
-        if (this.questions.length < this.targetQuestionCount) {
-          this.loadBackgroundBatch(batchSizes, index + 1);
-        } else {
-          this.moreQuestionsLoading = false;
-          this.stopLoadingMoreAnimation();
-        }
-      },
-      error: (err) => {
-        console.error('Failed to load background questions:', err);
-        this.moreQuestionsLoading = false;
-        this.stopLoadingMoreAnimation();
-      }
-    });
   }
 
   nextQuestion() {
@@ -413,7 +344,8 @@ export class QuizComponent implements OnInit {
     });
 
     const total = this.questions.length;
-    const quizResult = {
+    const currentUser = this.authService.getCurrentUser();
+    const quizResult: any = {
       topic: this.topic,
       score,
       total,
@@ -424,14 +356,22 @@ export class QuizComponent implements OnInit {
       status: 'completed'
     };
 
+    if (currentUser) {
+      quizResult.user_id = currentUser.id;
+      quizResult.user_email = currentUser.email;
+      quizResult.user_name = currentUser.name;
+    }
+
     // Store results locally for immediate review
     sessionStorage.setItem('quizResults', JSON.stringify(quizResult));
 
-    // Persist the exam history for authenticated users
-    this.mcqService.saveQuizHistory(quizResult).subscribe({
-      next: () => console.log('Quiz history saved'),
-      error: (err) => console.warn('Could not save quiz history', err)
-    });
+    // Persist the exam history only for logged-in users
+    if (currentUser) {
+      this.mcqService.saveQuizHistory(quizResult).subscribe({
+        next: () => console.log('Quiz history saved'),
+        error: (err) => console.warn('Could not save quiz history', err)
+      });
+    }
 
     this.router.navigate(['/results']);
   }

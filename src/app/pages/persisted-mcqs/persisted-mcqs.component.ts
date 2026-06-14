@@ -440,12 +440,14 @@ export class PersistedMcqsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isAuthenticated = this.authService.isAuthenticated();
-    if (this.isAuthenticated) {
-      this.loadPersistedMCQs();
-    } else {
-      this.isLoading = false;
-    }
+    this.authService.isAuthenticated$.subscribe((auth) => {
+      this.isAuthenticated = auth;
+      if (auth) {
+        this.loadPersistedMCQs();
+      } else {
+        this.isLoading = false;
+      }
+    });
   }
 
   private loadPersistedMCQs() {
