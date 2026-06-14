@@ -15,7 +15,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AuthGuard } from './services/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'topics/:topic', component: TopicSelectionComponent },
   { path: 'cbse', component: CbseComponent },
