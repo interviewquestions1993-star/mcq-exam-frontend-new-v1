@@ -38,7 +38,7 @@ interface ChapterItem {
       <!-- Header -->
       <div class="header-section">
         <div class="header-content">
-          <button mat-icon-button class="back-button" (click)="goBack()">
+          <button mat-icon-button type="button" class="back-button" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
           </button>
           <h1>Class {{ classNumber }} - {{ subjectDisplayName }}</h1>
@@ -282,6 +282,6 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/cbse', this.classNumber, 'subjects']);
+    this.router.navigate(['/']);
   }
 }
