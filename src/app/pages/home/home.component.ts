@@ -122,7 +122,8 @@ export class HomeComponent implements OnInit {
     { name: 'Science', icon: '🔬', chapters: 13, id: 'science' },
     { name: 'Mathematics', icon: '🔢', chapters: 14, id: 'mathematics' },
     { name: 'English', icon: '📖', chapters: 15, id: 'english' },
-    { name: 'Hindi', icon: '🗣️', chapters: 10, id: 'hindi' }
+    { name: 'Hindi', icon: '🗣️', chapters: 10, id: 'hindi' },
+    { name: 'Social Studies', icon: '🌍', chapters: 7, id: 'social-studies' }
   ];
 
   // Security: List of banned words to prevent inappropriate content
@@ -162,7 +163,8 @@ export class HomeComponent implements OnInit {
       'science': 'science',
       'mathematics': 'math',
       'english': 'english',
-      'hindi': 'hindi'
+      'hindi': 'hindi',
+      'social-studies': 'social-studies'
     };
     const subjectKey = subjectMap[subject.id] || subject.id;
     this.router.navigate(['/cbse', '8', 'subjects', subjectKey, 'chapters']);

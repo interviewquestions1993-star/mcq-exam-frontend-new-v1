@@ -665,7 +665,7 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
           { id: 'c8e-1', name: 'The Wit that Won Hearts', chapterNumber: 1 },
           { id: 'c8e-2', name: 'A Concrete Example', chapterNumber: 2 },
           { id: 'c8e-3', name: 'Wisdom Paves the Way', chapterNumber: 3 },
-          { id: 'c8e-4', name: 'A Tale of Valour: Major Somnath Sharma and the Battle of Badgam', chapterNumber: 4 },
+          { id: 'c8e-4', name: 'A Tale of Valour', chapterNumber: 4 },
           { id: 'c8e-5', name: 'Somebody’s Mother', chapterNumber: 5 },
           { id: 'c8e-6', name: 'Verghese Kurien: I Too Had a Dream', chapterNumber: 6 },
           { id: 'c8e-7', name: 'The Case of the Fifth Word', chapterNumber: 7 },

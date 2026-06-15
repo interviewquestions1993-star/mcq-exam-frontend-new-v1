@@ -26,6 +26,8 @@ const SUBJECT_META: Record<string, { icon: string; description: string; displayN
   science: { icon: '🧪', description: 'Physics, Chemistry & Biology', displayName: 'Science' },
   'social-history': { icon: '🏛️', description: 'Indian history and cultural heritage', displayName: 'History' },
   'social-geography': { icon: '🗺️', description: 'Physical geography and environment', displayName: 'Geography' },
+  'social-studies': { icon: '🌍', description: 'Social studies: History, Geography & Civics', displayName: 'Social Studies' },
+  social: { icon: '🌍', description: 'Social studies: History, Geography & Civics', displayName: 'Social Studies' },
   'social-civics': { icon: '⚖️', description: 'Civics, democracy and citizenship', displayName: 'Civics' },
   economics: { icon: '💰', description: 'Basic economic principles and national economy', displayName: 'Economics' },
   physics: { icon: '⚛️', description: 'Advanced physics concepts', displayName: 'Physics' },
@@ -121,7 +123,14 @@ export class CbseSubjectsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (subjectsData) => {
-          this.subjects = subjectsData.map(subject => {
+          // Filter out individual social subjects and keep only social-studies (integrated)
+          const filtered = subjectsData.filter(subject => {
+            const subjectKey = subject.id.replace(/^class\d+-/, '');
+            // Exclude individual social components, keep only social-studies
+            return !['social-history', 'social-geography', 'social-civics'].includes(subjectKey);
+          });
+
+          this.subjects = filtered.map(subject => {
             const subjectKey = subject.id.replace(/^class\d+-/, '');
             const meta = SUBJECT_META[subjectKey] || {
               icon: '📘',
