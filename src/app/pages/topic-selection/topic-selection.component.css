@@ -52,6 +52,67 @@
   gap: 32px;
 }
 
+.variant-selector-section {
+  padding: 24px;
+  background: linear-gradient(135deg, #fefefe 0%, #f9fafb 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.variant-selector-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.variant-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.variant-button {
+  position: relative;
+  display: inline-block;
+}
+
+.variant-button input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.variant-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 48px;
+  padding: 8px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  color: #111827;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.variant-button input:checked + .variant-label {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.variant-label:hover {
+  border-color: #667eea;
+}
+
 .concepts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -89,6 +150,32 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55) !important;
 }
 
+:host-context(.dark-theme) .variant-selector-section {
+  background: #0f1724 !important;
+  border-color: #374151 !important;
+}
+
+:host-context(.dark-theme) .variant-selector-section h3,
+:host-context(.dark-theme) .variant-label {
+  color: #e6eef8 !important;
+}
+
+:host-context(.dark-theme) .variant-label {
+  background: #1a2a42 !important;
+  border-color: #374151 !important;
+}
+
+:host-context(.dark-theme) .variant-button input:checked + .variant-label {
+  border-color: #f59e0b !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(253, 224, 71, 0.12)) !important;
+  color: #fcd34d !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3) !important;
+}
+
+:host-context(.dark-theme) .variant-label:hover {
+  border-color: #f59e0b !important;
+}
+
 :host-context(.dark-theme) .concept-card.selected {
   border-color: #f59e0b !important;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(253, 224, 71, 0.12)) !important;
@@ -97,6 +184,15 @@
 
 :host-context(.dark-theme) .concept-card:hover {
   border-color: #f59e0b !important;
+}
+
+:host-context(.dark-theme) .concept-info h3,
+:host-context(.dark-theme) .concept-info p {
+  color: #e6eef8 !important;
+}
+
+:host-context(.dark-theme) .concept-info p {
+  color: #a1aec4 !important;
 }
 
 :host-context(.dark-theme) .pill-content {

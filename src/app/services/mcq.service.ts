@@ -56,6 +56,7 @@ export class MCQService {
 
   generateQuestions(topic: string, numQuestions: number = 5, difficulty?: string): Observable<MCQResponse> {
     const lowerTopic = (topic || '').toLowerCase();
+    const isCbseTopic = lowerTopic.includes('cbse') || lowerTopic.includes('ncert') || lowerTopic.includes('english grammar');
     const payload: any = {
       topic,
       num_questions: numQuestions,
@@ -63,7 +64,7 @@ export class MCQService {
     };
 
     if (numQuestions < 0) {
-      if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
+      if (isCbseTopic) {
         payload.num_questions = -1;
       } else {
         // For generic topic generation, use the maximum supported question count
@@ -71,7 +72,7 @@ export class MCQService {
       }
     }
 
-    if (lowerTopic.includes('cbse') || lowerTopic.includes('ncert')) {
+    if (isCbseTopic) {
       return this.http.post<MCQResponse>(this.getCbseApiUrl(), payload);
     }
 

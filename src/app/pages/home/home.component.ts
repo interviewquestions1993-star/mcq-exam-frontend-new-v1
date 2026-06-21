@@ -77,6 +77,22 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </ng-template>
 
+      <!-- Other Topics Section -->
+      <div class="other-topics-section">
+        <h2>Other Topics</h2>
+        <div class="topics-grid">
+          <div
+            *ngFor="let topic of genericTopics"
+            class="topic-card"
+            (click)="navigateToTopic(topic)"
+          >
+            <div class="topic-icon">{{ topic.icon }}</div>
+            <h3>{{ topic.name }}</h3>
+            <p class="difficulty">Explore focused grammar practice</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Features Section -->
       <div class="features-section">
         <h2>Why Choose Us?</h2>
@@ -127,6 +143,10 @@ export class HomeComponent implements OnInit {
     { name: 'Social Studies', icon: '🌍', chapters: 7, id: 'social-studies' }
   ];
 
+  genericTopics = [
+    { name: 'English Grammar', icon: '✍️' }
+  ];
+
   // Security: List of banned words to prevent inappropriate content
   private bannedWords = [
     'sex', 'adult', 'porn', 'nude', 'naked', 'erotic', 'xxx', 'nsfw',
@@ -174,5 +194,9 @@ export class HomeComponent implements OnInit {
 
   viewPersistedMCQs() {
     this.router.navigate(['/persisted-mcqs']);
+  }
+
+  navigateToTopic(topic: any) {
+    this.router.navigate(['/topics', topic.name]);
   }
 }

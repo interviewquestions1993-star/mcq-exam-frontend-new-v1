@@ -54,27 +54,67 @@ interface TopicConcept {
 
       <!-- Concepts List -->
       <div *ngIf="!isLoading && concepts.length > 0" class="concepts-section">
+        <!-- Variant Selector for English Grammar -->
+        <div *ngIf="isVariantTopic()" class="variant-selector-section">
+          <h3>Select Version</h3>
+          <div class="variant-buttons">
+            <label *ngFor="let variant of ['v1', 'v2', 'v3', 'v4']" class="variant-button">
+              <input
+                type="radio"
+                name="variantSelect"
+                [(ngModel)]="selectedVariant"
+                [value]="variant"
+              />
+              <span class="variant-label">{{ variant | uppercase }}</span>
+            </label>
+          </div>
+        </div>
+
         <div class="concepts-grid">
-          <mat-card *ngFor="let concept of concepts" class="concept-card" [class.selected]="concept.selected && !useCustomTopics" [class.disabled]="useCustomTopics">
-            <mat-card-content>
-              <div class="concept-header">
-                <mat-checkbox
-                  [(ngModel)]="concept.selected"
-                  (change)="onConceptToggle(concept)"
-                  [disabled]="useCustomTopics"
-                  color="primary"
-                ></mat-checkbox>
-                <div class="concept-info">
-                  <h3>{{ concept.name }}</h3>
-                  <p>{{ concept.description }}</p>
+          <ng-container *ngIf="isVariantTopic(); else multiSelectConcepts">
+            <mat-card *ngFor="let concept of concepts" class="concept-card" [class.selected]="concept.id === selectedConceptId">
+              <mat-card-content>
+                <div class="concept-header">
+                  <label class="concept-radio">
+                    <input
+                      type="radio"
+                      name="conceptSelect"
+                      [(ngModel)]="selectedConceptId"
+                      [value]="concept.id"
+                      (change)="onConceptSelect(concept)"
+                    />
+                  </label>
+                  <div class="concept-info">
+                    <h3>{{ concept.name }}</h3>
+                    <p>{{ concept.description }}</p>
+                  </div>
                 </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
+              </mat-card-content>
+            </mat-card>
+          </ng-container>
+
+          <ng-template #multiSelectConcepts>
+            <mat-card *ngFor="let concept of concepts" class="concept-card" [class.selected]="concept.selected && !useCustomTopics" [class.disabled]="useCustomTopics">
+              <mat-card-content>
+                <div class="concept-header">
+                  <mat-checkbox
+                    [(ngModel)]="concept.selected"
+                    (change)="onConceptToggle(concept)"
+                    [disabled]="useCustomTopics"
+                    color="primary"
+                  ></mat-checkbox>
+                  <div class="concept-info">
+                    <h3>{{ concept.name }}</h3>
+                    <p>{{ concept.description }}</p>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
         </div>
 
         <!-- Custom Topics Section -->
-        <div class="custom-topics-section">
+        <div class="custom-topics-section" *ngIf="!isVariantTopic()">
           <mat-card class="custom-topics-card">
             <mat-card-content>
               <div class="custom-topics-header">
@@ -101,6 +141,65 @@ interface TopicConcept {
               </div>
             </mat-card-content>
           </mat-card>
+        </div>
+
+        <!-- Chapter Variant Selector -->
+        <div class="question-count-group" *ngIf="isVariantTopic()">
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="topicVariant"
+              value="v1"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v1</span>
+              <span class="pill-subtitle">Variant 1</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="topicVariant"
+              value="v2"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v2</span>
+              <span class="pill-subtitle">Variant 2</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="topicVariant"
+              value="v3"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v3</span>
+              <span class="pill-subtitle">Variant 3</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="topicVariant"
+              value="v4"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v4</span>
+              <span class="pill-subtitle">Variant 4</span>
+            </div>
+          </label>
         </div>
 
         <!-- Question Count Selector -->
@@ -207,33 +306,16 @@ interface TopicConcept {
         <!-- Action Buttons -->
         <div class="action-buttons">
           <button
-            mat-stroked-button
-            color="primary"
-            class="action-button select-all-button"
-            (click)="selectAll()"
-            [disabled]="useCustomTopics"
-          >
-            Select All
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            class="action-button clear-all-button"
-            (click)="clearAll()"
-            [disabled]="useCustomTopics"
-          >
-            Clear All
-          </button>
-          <button
             mat-raised-button
             color="primary"
             class="action-button start-quiz-button"
-            [disabled]="(!useCustomTopics && selectedConcepts.length === 0) || (useCustomTopics && !customTopics.trim())"
+            [disabled]="isStartQuizDisabled()"
             (click)="startQuiz()"
           >
             Start Quiz
+            <span *ngIf="isVariantTopic()"> ({{ selectedVariant | uppercase }})</span>
             <span *ngIf="useCustomTopics && customTopics.trim()"> (Custom Topics)</span>
-            <span *ngIf="!useCustomTopics && selectedConcepts.length > 0"> ({{ selectedConcepts.length }} concepts)</span>
+            <span *ngIf="!isVariantTopic() && !useCustomTopics && selectedConcepts.length > 0"> ({{ selectedConcepts.length }} concepts)</span>
           </button>
         </div>
       </div>
@@ -263,6 +345,8 @@ export class TopicSelectionComponent implements OnInit {
   useCustomTopics = false;
   customTopics = '';
   questionCount = 10;
+  selectedVariant: 'v1' | 'v2' | 'v3' | 'v4' | null = null;
+  selectedConceptId = '';
 
   get selectedConcepts(): TopicConcept[] {
     return this.concepts.filter(c => c.selected);
@@ -336,6 +420,11 @@ export class TopicSelectionComponent implements OnInit {
         { id: '6', name: 'Decorators', description: 'Metadata and runtime behavior modification', selected: false },
         { id: '7', name: 'Union Types', description: 'Multiple possible types for a value', selected: false },
         { id: '8', name: 'Type Guards', description: 'Runtime type checking', selected: false }
+      ],
+      'English Grammar': [
+        { id: '1', name: 'Letter Writing', description: 'Formal and informal letter structure and practice', selected: false },
+        { id: '2', name: 'Tenses', description: 'Present, past, and future tense rules and usage', selected: false },
+        { id: '3', name: 'Verbs', description: 'Verb forms, agreement, and verb types', selected: false }
       ],
       'Machine Learning': [
         { id: '1', name: 'Supervised Learning', description: 'Learning from labeled data', selected: false },
@@ -420,16 +509,53 @@ export class TopicSelectionComponent implements OnInit {
     }
   }
 
+  onConceptSelect(concept: TopicConcept) {
+    this.selectedConceptId = concept.id;
+  }
+
+  isVariantTopic(): boolean {
+    return this.topicName.trim().toLowerCase() === 'english grammar';
+  }
+
+  isStartQuizDisabled(): boolean {
+    if (this.isVariantTopic()) {
+      return !this.selectedVariant || !this.selectedConceptId;
+    }
+    if (this.useCustomTopics) {
+      return !this.customTopics.trim();
+    }
+    return this.selectedConcepts.length === 0;
+  }
+
   startQuiz() {
     let quizTopic = this.topicName;
 
-    if (this.useCustomTopics && this.customTopics.trim()) {
+    const variantSuffix = this.selectedVariant ? `-${this.selectedVariant}` : '';
+
+    if (this.isVariantTopic()) {
+      if (!this.selectedVariant) {
+        this.snackBar.open('Please select a variant (v1-v4) to continue.', 'Close', {
+          duration: 3000
+        });
+        return;
+      }
+
+      if (!this.selectedConceptId) {
+        this.snackBar.open('Please select a topic before starting the quiz.', 'Close', {
+          duration: 3000
+        });
+        return;
+      }
+
+      const selectedConcept = this.concepts.find(c => c.id === this.selectedConceptId);
+      quizTopic = `${this.topicName}: ${selectedConcept?.name || 'Topic'}${variantSuffix}`;
+    } else if (this.useCustomTopics && this.customTopics.trim()) {
       // Use custom topics
-      quizTopic = `${this.topicName}: ${this.customTopics.trim()}`;
+      quizTopic = `${this.topicName}${variantSuffix}: ${this.customTopics.trim()}`;
     } else if (this.selectedConcepts.length > 0) {
       // Use selected concepts
       const selectedConceptNames = this.selectedConcepts.map(c => c.name);
-      quizTopic = `${this.topicName}: ${selectedConceptNames.join(', ')}`;
+      quizTopic = `${this.topicName}${variantSuffix}: ${selectedConceptNames.join(', ')}`;
     } else {
       this.snackBar.open('Please select concepts or specify custom topics to start the quiz.', 'Close', {
         duration: 3000
