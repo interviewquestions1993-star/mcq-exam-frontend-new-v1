@@ -73,6 +73,69 @@ interface ChapterItem {
           </mat-card>
         </div>
 
+        <!-- Chapter Variant Selector -->
+        <div class="question-count-group">
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="chapterVariant"
+              value="v1"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+              [disabled]="!selectedChapterId"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v1</span>
+              <span class="pill-subtitle">Variant 1</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="chapterVariant"
+              value="v2"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+              [disabled]="!selectedChapterId"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v2</span>
+              <span class="pill-subtitle">Variant 2</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="chapterVariant"
+              value="v3"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+              [disabled]="!selectedChapterId"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v3</span>
+              <span class="pill-subtitle">Variant 3</span>
+            </div>
+          </label>
+
+          <label class="count-pill">
+            <input
+              type="radio"
+              name="chapterVariant"
+              value="v4"
+              [(ngModel)]="selectedVariant"
+              class="count-input"
+              [disabled]="!selectedChapterId"
+            />
+            <div class="pill-content">
+              <span class="pill-label">v4</span>
+              <span class="pill-subtitle">Variant 4</span>
+            </div>
+          </label>
+        </div>
+
         <!-- Question Count Selector -->
         <div class="question-count-group">
           <label class="count-pill">
@@ -197,6 +260,7 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
   subjectDisplayName = '';
   chapters: ChapterItem[] = [];
   questionCount = 10;
+  selectedVariant: 'v1' | 'v2' | 'v3' | 'v4' | null = null;
   isLoading$ = new BehaviorSubject<boolean>(false);
   selectedChapterId: string | null = null;
   private destroy$ = new Subject<void>();
@@ -263,6 +327,7 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
 
   onChapterSelect(chapter: ChapterItem) {
     this.selectedChapterId = chapter.id;
+    this.selectedVariant = null;
   }
 
   startQuiz() {
@@ -273,10 +338,18 @@ export class CbseChaptersComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.selectedVariant) {
+      this.snackBar.open('Please select a chapter variant (v1-v4) to continue.', 'Close', {
+        duration: 3000
+      });
+      return;
+    }
+
     const selected = this.chapters.find(c => c.id === this.selectedChapterId);
-    const selectedChapterNames = selected ? [selected.name] : [];
-    const quizTopic = `CBSE Class ${this.classNumber} ${this.subjectDisplayName}: ${selectedChapterNames.join(', ')}`;
-    this.router.navigate(['/quiz', quizTopic], {
+    const selectedChapterName = selected ? selected.name : 'Unknown Chapter';
+    const topicValue = `CBSE Class ${this.classNumber} ${this.subjectDisplayName}: ${selectedChapterName}-${this.selectedVariant}`;
+
+    this.router.navigate(['/quiz', topicValue], {
       queryParams: { count: this.questionCount }
     });
   }
