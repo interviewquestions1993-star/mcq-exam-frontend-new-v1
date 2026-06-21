@@ -12,9 +12,11 @@ export class AuthGuard {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    if (this.authService.isAuthenticated()) {
+    if (this.authService.isAuthenticated() && !this.authService.isSessionExpired()) {
       return true;
     }
+
+    this.authService.logout();
 
     // Store the attempted URL for redirecting after login
     this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
@@ -30,10 +32,11 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
+  if (authService.isAuthenticated() && !authService.isSessionExpired()) {
     return true;
   }
 
+  authService.logout();
   router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
   return false;
 };

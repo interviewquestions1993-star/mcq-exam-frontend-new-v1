@@ -77,6 +77,12 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
+:host-context(.dark-theme) .chapter-card.selected {
+  border-color: #f59e0b !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(253, 224, 71, 0.12)) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.18) !important;
+}
+
 .chapter-header {
   display: flex;
   gap: 16px;
@@ -190,6 +196,41 @@
 .count-input:checked + .pill-content .pill-label,
 .count-input:checked + .pill-content .pill-subtitle {
   color: #ffffff;
+}
+
+:host-context(.dark-theme) .chapter-card,
+:host-context(.dark-theme) .chapter-card:hover,
+:host-context(.dark-theme) .count-pill,
+:host-context(.dark-theme) .pill-content,
+:host-context(.dark-theme) .count-input:checked + .pill-content {
+  background: #0f1724 !important;
+  border-color: #374151 !important;
+  color: #e6eef8 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55) !important;
+}
+
+:host-context(.dark-theme) .count-input:checked + .pill-content {
+  background: #111827 !important;
+  border-color: #475569 !important;
+}
+
+:host-context(.dark-theme) .count-input:checked + .pill-content .pill-label,
+:host-context(.dark-theme) .count-input:checked + .pill-content .pill-subtitle,
+:host-context(.dark-theme) .pill-label,
+:host-context(.dark-theme) .pill-subtitle,
+:host-context(.dark-theme) .chapter-info h3,
+:host-context(.dark-theme) .chapter-info p,
+:host-context(.dark-theme) .subtitle,
+:host-context(.dark-theme) .loading-spinner p,
+:host-context(.dark-theme) .empty-state p {
+  color: #e6eef8 !important;
+}
+
+:host-context(.dark-theme) .chapter-info p,
+:host-context(.dark-theme) .subtitle,
+:host-context(.dark-theme) .loading-spinner p,
+:host-context(.dark-theme) .empty-state p {
+  color: #9aa7bf !important;
 }
 
 @media (max-width: 768px) {

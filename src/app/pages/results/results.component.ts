@@ -30,6 +30,29 @@ interface QuizResults {
   template: `
     <div class="results-container">
       <div *ngIf="results; else noResults">
+        <div class="print-header">
+          <h2>Quiz Results — {{ results.topic }}</h2>
+          <p>{{ results.score }}/{{ results.total }} • {{ results.percentage }}% • {{ results.questions.length }} questions</p>
+        </div>
+
+        <div class="results-header">
+          <div>
+            <h1>Quiz Results</h1>
+            <p class="results-meta">{{ results.topic }} · {{ results.score }}/{{ results.total }} · {{ results.percentage }}%</p>
+          </div>
+          <div class="action-buttons top-actions">
+            <button mat-raised-button class="action-button pdf-button" (click)="saveAsPDF()">
+              💾 Save as PDF
+            </button>
+            <button mat-raised-button class="action-button home-button" (click)="goHome()">
+              🏠 Home
+            </button>
+            <button mat-raised-button class="action-button retake-button" (click)="retakeQuiz()">
+              🔄 Retake Quiz
+            </button>
+          </div>
+        </div>
+
         <div class="summary-card" [ngClass]="'score-' + getGrade(results.percentage)">
           <div class="score-circle">
             <div class="circle-value">{{ results.percentage }}%</div>
@@ -92,14 +115,6 @@ interface QuizResults {
           </div>
         </div>
 
-        <div class="action-buttons">
-          <button mat-raised-button class="action-button home-button" (click)="goHome()">
-            🏠 Home
-          </button>
-          <button mat-raised-button class="action-button retake-button" (click)="retakeQuiz()">
-            🔄 Retake Quiz
-          </button>
-        </div>
       </div>
 
       <ng-template #noResults>
@@ -161,6 +176,10 @@ export class ResultsComponent implements OnInit {
       sessionStorage.removeItem('quizResults');
       this.router.navigate(['/quiz', this.results.topic]);
     }
+  }
+
+  saveAsPDF() {
+    window.print();
   }
 
   private normalizeAnswer(answer: string | null | undefined): string {

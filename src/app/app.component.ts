@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { RouterOutlet, RouterLink } from '@angular/router';
@@ -7,7 +7,7 @@ import { ThemeService } from './services/theme.service';
 import { CommonModule } from '@angular/common';
 import { SeoService } from './services/seo.service';
 import { AuthService, AuthUser } from './services/auth.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 declare let gtag: Function;
 
@@ -83,10 +83,14 @@ declare let gtag: Function;
   `,
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   currentUser$: Observable<AuthUser | null>;
   isAuthenticated$: Observable<boolean>;
   theme: string = 'light';
+  private activityEvents = ['mousemove', 'keydown', 'scroll', 'touchstart'];
+  private activityTimeoutMs = 3 * 60 * 60 * 1000; // 3 hours
+  private activityTimerId: any;
+  private routerSubscription: Subscription | null = null;
 
   constructor(
     private router: Router,
@@ -101,8 +105,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.setupIdleTimeout();
+
     // Handle route changes for analytics and SEO
-    this.router.events
+    this.routerSubscription = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map(() => this.activatedRoute),
@@ -130,7 +136,59 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
+  }
+
+  ngOnDestroy(): void {
+    this.teardownIdleTimeout();
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+      this.routerSubscription = null;
+    }
+  }
+
+  private setupIdleTimeout(): void {
+    this.refreshActivityTimer();
+
+    for (const eventName of this.activityEvents) {
+      window.addEventListener(eventName, this.onUserActivity, true);
+    }
+  }
+
+  private teardownIdleTimeout(): void {
+    if (this.activityTimerId) {
+      clearTimeout(this.activityTimerId);
+      this.activityTimerId = null;
+    }
+
+    for (const eventName of this.activityEvents) {
+      window.removeEventListener(eventName, this.onUserActivity, true);
+    }
+  }
+
+  private onUserActivity = (): void => {
+    if (this.authService.isAuthenticated()) {
+      if (this.authService.isSessionExpired()) {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      } else {
+        this.authService.refreshSession();
+        this.refreshActivityTimer();
+      }
+    }
+  };
+
+  private refreshActivityTimer(): void {
+    if (this.activityTimerId) {
+      clearTimeout(this.activityTimerId);
+    }
+
+    this.activityTimerId = setTimeout(() => {
+      if (this.authService.isAuthenticated()) {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      }
+    }, this.activityTimeoutMs);
   }
 
   toggleTheme() {

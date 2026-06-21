@@ -298,6 +298,75 @@
   margin: 0 0 12px 0;
 }
 
+/* Dark mode overrides for quiz page */
+:host.dark-theme .loading-card,
+.dark-theme .loading-card {
+  background: #0f1724 !important;
+  box-shadow: 0 2px 12px rgba(2,6,23,0.6) !important;
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .question-container,
+.dark-theme .question-container {
+  background: #0f1724 !important;
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .question-card,
+.dark-theme .question-card {
+  background: #0f1724 !important;
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .option-label,
+.dark-theme .option-label {
+  background: #1a2332 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .option-label:hover,
+.dark-theme .option-label:hover {
+  background: #232d3f !important;
+  border-color: #667eea !important;
+}
+
+:host.dark-theme .loading-steps span,
+.dark-theme .loading-steps span {
+  background: #1a2332 !important;
+  color: #9aa7bf !important;
+}
+
+:host.dark-theme .loading-hold-message,
+.dark-theme .loading-hold-message {
+  background: rgba(102, 126, 234, 0.15) !important;
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .current-question,
+:host.dark-theme .question-text,
+:host.dark-theme .option-text,
+.dark-theme .current-question,
+.dark-theme .question-text,
+.dark-theme .option-text {
+  color: #e6eef8 !important;
+}
+
+:host.dark-theme .progress-info,
+.dark-theme .progress-info {
+  color: #9aa7bf !important;
+}
+
+:host.dark-theme .loader-heading,
+.dark-theme .loader-heading {
+  color: #ffffff !important;
+}
+
+:host.dark-theme .error-content h2,
+.dark-theme .error-content h2 {
+  color: #ffffff !important;
+}
+
 .error-content p {
   color: #4b5563;
   margin: 0 0 24px 0;

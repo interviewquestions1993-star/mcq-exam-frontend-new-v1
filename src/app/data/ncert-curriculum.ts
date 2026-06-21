@@ -637,6 +637,24 @@ export const NCERT_CURRICULUM: ClassCurriculum[] = [
         ],
       },
       {
+        id: 'class8-computer-science',
+        name: 'Computer Science',
+        bookName: 'Computer Science',
+        chapters: [
+          { id: 'c8cs-1', name: 'Operating Systems', chapterNumber: 1 },
+          { id: 'c8cs-2', name: 'Advanced Features of Excel 2019', chapterNumber: 2 },
+          { id: 'c8cs-3', name: 'ICT Applications', chapterNumber: 3 },
+          { id: 'c8cs-4', name: 'Tables, Queries, Forms and Reports in Access', chapterNumber: 4 },
+          { id: 'c8cs-5', name: 'Computer Networking', chapterNumber: 5 },
+          { id: 'c8cs-6', name: 'More About Design Thinking', chapterNumber: 6 },
+          { id: 'c8cs-7', name: 'Tables and Forms in HTML', chapterNumber: 7 },
+          { id: 'c8cs-8', name: 'Artificial Intelligence', chapterNumber: 8 },
+          { id: 'c8cs-9', name: 'Control Structures in Python', chapterNumber: 9 },
+          { id: 'c8cs-10', name: 'Special Pages: Basics of Financial Literacy', chapterNumber: 10 },
+          { id: 'c8cs-11', name: 'National Cyber Olympiad Sample Paper', chapterNumber: 11 }
+        ]
+      },
+      {
         id: 'class8-science',
         name: 'Science',
         bookName: 'Curiosity',

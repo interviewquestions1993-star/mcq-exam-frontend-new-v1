@@ -122,6 +122,7 @@ export class HomeComponent implements OnInit {
     { name: 'Science', icon: '🔬', chapters: 13, id: 'science' },
     { name: 'Mathematics', icon: '🔢', chapters: 14, id: 'mathematics' },
     { name: 'English', icon: '📖', chapters: 15, id: 'english' },
+    { name: 'Computer Science', icon: '💻', chapters: 11, id: 'computer-science' },
     { name: 'Hindi', icon: '🗣️', chapters: 10, id: 'hindi' },
     { name: 'Social Studies', icon: '🌍', chapters: 7, id: 'social-studies' }
   ];
@@ -163,6 +164,7 @@ export class HomeComponent implements OnInit {
       'science': 'science',
       'mathematics': 'math',
       'english': 'english',
+      'computer-science': 'computer-science',
       'hindi': 'hindi',
       'social-studies': 'social-studies'
     };

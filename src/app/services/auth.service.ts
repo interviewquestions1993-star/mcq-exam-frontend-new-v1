@@ -21,6 +21,8 @@ export class AuthService {
 
   private tokenKey = 'google_auth_token';
   private userKey = 'google_auth_user';
+  private lastActivityKey = 'google_auth_last_activity';
+  private sessionTimeoutMs = 3 * 60 * 60 * 1000; // 3 hours
 
   constructor() {
     this.restoreAuth();
@@ -45,6 +47,7 @@ export class AuthService {
       // Store user info and token
       localStorage.setItem(this.tokenKey, response.credential);
       localStorage.setItem(this.userKey, JSON.stringify(user));
+      localStorage.setItem(this.lastActivityKey, Date.now().toString());
 
       // Update observables
       this.currentUserSubject.next(user);
@@ -61,6 +64,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.lastActivityKey);
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
 
@@ -91,6 +95,30 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
+  hasStoredToken(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
+  }
+
+  refreshSession(): void {
+    if (this.isAuthenticatedSubject.value) {
+      localStorage.setItem(this.lastActivityKey, Date.now().toString());
+    }
+  }
+
+  isSessionExpired(): boolean {
+    const lastActivity = localStorage.getItem(this.lastActivityKey);
+    if (!lastActivity) {
+      return true;
+    }
+
+    const lastTime = Number(lastActivity);
+    if (!Number.isFinite(lastTime)) {
+      return true;
+    }
+
+    return Date.now() - lastTime >= this.sessionTimeoutMs;
+  }
+
   /**
    * Restore authentication from localStorage
    */
@@ -100,6 +128,11 @@ export class AuthService {
 
     if (token && userStr) {
       try {
+        if (this.isSessionExpired()) {
+          this.logout();
+          return;
+        }
+
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);

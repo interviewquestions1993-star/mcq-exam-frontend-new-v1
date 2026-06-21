@@ -47,21 +47,54 @@ html, body {
 .dark-theme .mat-mdc-form-field .mat-mdc-form-field-wrapper,
 .dark-theme .quiz-container .progress-header,
 .dark-theme .quiz-container .question-container,
+.dark-theme .quiz-container .question-card,
+.dark-theme .quiz-container .option-label,
 .dark-theme .quiz-container .navigation-buttons,
 .dark-theme .quiz-container .no-results-card,
+.dark-theme .quiz-container .loading-card,
 .dark-theme .results-container .stat-card,
 .dark-theme .results-container .review-card,
+.dark-theme .results-container .answer-item,
+.dark-theme .results-container mat-card,
+.dark-theme .results-container .answer-details,
+.dark-theme .results-container .explanation,
 .dark-theme .results-container .no-results-card,
 .dark-theme .persisted-container .mcq-card,
 .dark-theme .no-data-card,
 .dark-theme .mcq-card,
 .dark-theme .question-item,
 .dark-theme .answer-summary,
-.dark-theme .explanation-section {
+.dark-theme .explanation-section,
+.dark-theme .card,
+.dark-theme [class*="card"],
+.dark-theme mat-card,
+.dark-theme .loading-steps span,
+.dark-theme .topic-selection-container .concept-card,
+.dark-theme .topic-selection-container .concept-card.disabled,
+.dark-theme .topic-selection-container .custom-topics-card,
+.dark-theme .topic-selection-container .pill-content,
+.dark-theme .topic-selection-container .count-pill,
+.dark-theme .cbse-chapters-container .chapter-card,
+.dark-theme .cbse-chapters-container .pill-content,
+.dark-theme .cbse-chapters-container .count-pill {
   background: var(--card-bg, #0f1724) !important;
   color: var(--text-color) !important;
   border-color: var(--muted-border, rgba(255,255,255,0.06)) !important;
   box-shadow: 0 2px 12px rgba(2,6,23,0.6) !important;
+}
+
+/* Convert all inline white backgrounds to dark in dark mode */
+.dark-theme [style*="background: white"],
+.dark-theme [style*="background: #fff"],
+.dark-theme [style*="background: #ffffff"],
+.dark-theme [style*="background-color: white"],
+.dark-theme [style*="background-color: #fff"],
+.dark-theme [style*="background-color: #ffffff"],
+.dark-theme [style*="background-color: #f5f7fa"],
+.dark-theme [style*="background-color: #f8fafc"],
+.dark-theme [style*="background-color: #fafbfc"] {
+  background-color: var(--card-bg, #0f1724) !important;
+  background: var(--card-bg, #0f1724) !important;
 }
 
 /* Make sure text in dark theme is light */
@@ -72,6 +105,57 @@ html, body {
 .dark-theme .app-footer {
   color: var(--text-color) !important;
   background-color: var(--page-bg) !important;
+}
+
+/* Smart text contrast in dark mode - white on dark backgrounds, black on light backgrounds */
+
+/* Default: convert black text to white on dark backgrounds in dark mode */
+.dark-theme [style*="color: black"],
+.dark-theme [style*="color: #000"],
+.dark-theme [style*="color: #000000"],
+.dark-theme [style*="color:#000"],
+.dark-theme [style*="color:#000000"] {
+  color: #ffffff !important;
+}
+
+/* For elements with light/white backgrounds, keep text black */
+.dark-theme [style*="background: white"],
+.dark-theme [style*="background: #fff"],
+.dark-theme [style*="background: #ffffff"],
+.dark-theme [style*="background-color: white"],
+.dark-theme [style*="background-color: #fff"],
+.dark-theme [style*="background-color: #ffffff"],
+.dark-theme [style*="background-color: #f5f7fa"],
+.dark-theme [style*="background-color: #f8fafc"] {
+  color: #000000 !important;
+}
+
+/* Text elements in dark mode default to white for visibility */
+.dark-theme p:not([style*="background: white"]):not([style*="background: #fff"]):not([style*="background: #ffffff"]),
+.dark-theme span:not([style*="background: white"]):not([style*="background: #fff"]):not([style*="background: #ffffff"]),
+.dark-theme label:not([style*="background: white"]):not([style*="background: #fff"]):not([style*="background: #ffffff"]),
+.dark-theme .text:not([style*="background: white"]):not([style*="background: #fff"]):not([style*="background: #ffffff"]) {
+  color: #ffffff !important;
+}
+
+/* Headings in dark mode */
+.dark-theme h1:not([style*="background: white"]),
+.dark-theme h2:not([style*="background: white"]),
+.dark-theme h3:not([style*="background: white"]),
+.dark-theme h4:not([style*="background: white"]),
+.dark-theme h5:not([style*="background: white"]),
+.dark-theme h6:not([style*="background: white"]) {
+  color: #ffffff !important;
+}
+
+/* Convert dark brown to dark green for visibility on both white and black backgrounds */
+.dark-theme [style*="color: #4a3728"],
+.dark-theme [style*="color:#4a3728"],
+.dark-theme [style*="color: #5c3d2e"],
+.dark-theme [style*="color:#5c3d2e"],
+.dark-theme [style*="color: #6b4423"],
+.dark-theme [style*="color:#6b4423"] {
+  color: #3a6b1f !important;
 }
 
 /* Controls and inputs */
@@ -257,6 +341,43 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+@media print {
+  html,
+  body {
+    background: white !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .app-header,
+  .app-footer,
+  header,
+  footer,
+  .toolbar-container,
+  .main-nav,
+  .logo,
+  .theme-toggle,
+  .login-link,
+  .login-btn,
+  .auth-section,
+  .footer-content,
+  .footer-links,
+  .footer-copyright,
+  .mat-toolbar,
+  .mat-icon {
+    display: none !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+  }
+
+  body {
+    margin: 0 !important;
+  }
 }
 
 /* Responsive Utility */
